@@ -3,82 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Featured Story — DealStreets</title>
+    <title>DealStreets — Featured Story Builder</title>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             font-family: 'Rajdhani', sans-serif;
             background: #0a0a14;
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+            overflow: hidden;
             color: #e8e8f0;
-            min-height: 100vh;
         }
 
+        /* Night Sky Background */
         .night-sky {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 0;
+            z-index: -1;
             pointer-events: none;
-            overflow: hidden;
             background: radial-gradient(ellipse at center, #0a0a2a 0%, #020210 100%);
         }
 
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            opacity: 0;
-            animation: twinkle 3s infinite ease-in-out;
-        }
-
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.1; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.2); }
-        }
-
-        .shooting-star {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: linear-gradient(135deg, white, rgba(255,255,255,0));
-            border-radius: 50%;
-            opacity: 0;
-            animation: shoot 4s linear infinite;
-        }
-
-        @keyframes shoot {
-            0% {
-                transform: translateX(0) translateY(0) rotate(135deg);
-                opacity: 1;
-                width: 2px;
-            }
-            70% {
-                opacity: 1;
-                width: 80px;
-            }
-            100% {
-                transform: translateX(-300px) translateY(300px) rotate(135deg);
-                opacity: 0;
-                width: 2px;
-            }
-        }
-
-        .content-wrapper {
+        .app {
+            display: flex;
+            gap: 24px;
+            height: 100%;
+            max-width: 1600px;
+            margin: 0 auto;
             position: relative;
-            z-index: 10;
+            z-index: 1;
         }
 
-        .blog-header {
+        /* Visitor View */
+        .visitor-view {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #0a0a14;
+            z-index: 200;
+            overflow-y: auto;
+            padding: 20px;
+            display: none;
+        }
+
+        .visitor-view.show {
+            display: block;
+        }
+
+        .visitor-header {
             background: linear-gradient(90deg, rgba(10,10,20,0.95), rgba(19,21,30,0.95));
-            backdrop-filter: blur(5px);
             border-bottom: 1px solid #2a2d38;
             padding: 0 1.5rem;
             height: 70px;
@@ -87,973 +71,1165 @@
             justify-content: space-between;
             position: sticky;
             top: 0;
-            z-index: 50;
+            z-index: 10;
         }
 
-        .logo {
+        .visitor-logo {
             font-family: 'Bebas Neue', sans-serif;
             font-size: 2rem;
-            letter-spacing: 3px;
             color: #f0c040;
         }
 
-        .logo span {
-            color: #e63946;
-        }
+        .visitor-logo span { color: #e63946; }
 
-        .nav-link {
-            font-family: 'Share Tech Mono', monospace;
-            background: transparent;
-            border: 1.5px solid #2a2d38;
-            border-radius: 8px;
-            padding: 0.45rem 1.2rem;
-            color: #e8e8f0;
-            text-decoration: none;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-            cursor: pointer;
-            display: inline-block;
-            margin-left: 0.5rem;
-        }
-
-        .nav-link:hover {
-            border-color: #f0c040;
-            color: #f0c040;
-        }
-
-        .hero {
-            background: rgba(10,10,20,0.7);
-            backdrop-filter: blur(4px);
-            border-bottom: 2px solid #f0c040;
-            padding: 2rem 1.5rem;
-            text-align: center;
-        }
-
-        .hero h1 {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 2.5rem;
-            letter-spacing: 4px;
-            color: #f0c040;
-        }
-
-        .hero p {
-            font-size: 0.9rem;
-            color: #aaa;
-            margin-top: 0.3rem;
-        }
-
-        /* Featured Story View (what visitors see) */
-        .featured-view {
-            display: block;
+        .visitor-content {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 2rem 1.5rem;
+            padding: 2rem;
         }
 
-        .featured-view.hide {
-            display: none;
+        .visitor-block {
+            background: #16181f;
+            border-radius: 16px;
+            border: 1px solid #2a2d38;
+            margin-bottom: 2rem;
+            overflow: hidden;
         }
 
-        .featured-badge {
-            display: inline-block;
-            background: #f0c040;
-            color: #000;
+        /* Admin Toolbox */
+        .toolbox {
+            width: 320px;
+            background: #16181f;
+            border-radius: 24px;
+            border: 1px solid #2a2d38;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .toolbox h2 {
+            font-size: 1.3rem;
+            margin: 0 0 8px 0;
+            color: #f0c040;
             font-family: 'Bebas Neue', sans-serif;
-            padding: 0.2rem 0.8rem;
+        }
+
+        .drag-item {
+            background: linear-gradient(135deg, #1a1c26, #2a2d38);
+            border: 1px solid #f0c040;
+            color: #f0c040;
+            padding: 18px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            cursor: grab;
+            text-align: center;
+            font-weight: 600;
+            transition: transform 0.1s;
+        }
+
+        .drag-item:active { cursor: grabbing; }
+        .drag-item:hover { transform: scale(1.02); border-color: #f0c040; background: #2a2d38; }
+        .drag-item.text { border-color: #3b82f6; }
+        .drag-item.image { border-color: #10b981; }
+        .drag-item.video { border-color: #f59e0b; }
+        .drag-item.ranked { border-color: #e63946; }
+
+        .drag-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+
+        .folder-drop-zone {
+            background: #0a0a14;
+            border: 2px dashed #2a2d38;
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .folder-drop-zone.drag-over {
+            border-color: #10b981;
+            background: rgba(16,185,129,0.1);
+        }
+
+        .canvas-area {
+            flex: 1;
+            background: #0d0d14;
+            border-radius: 24px;
+            border: 1px solid #2a2d38;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .canvas-header {
+            padding: 16px 24px;
+            background: #16181f;
+            border-bottom: 1px solid #2a2d38;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .canvas-header h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            color: #f0c040;
+            margin: 0;
+        }
+
+        .canvas-controls { display: flex; gap: 12px; flex-wrap: wrap; }
+
+        button {
+            padding: 8px 16px;
+            border-radius: 40px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.2s;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .btn-preview { background: #f59e0b; color: white; }
+        .btn-save { background: #10b981; color: white; }
+        .btn-reset { background: #e63946; color: white; }
+        .btn-ruler { background: #3b82f6; color: white; }
+        .btn-publish { background: #f0c040; color: #000; font-weight: bold; }
+        .btn-logout { background: #6c757d; color: white; }
+
+        .grid-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            background: #0a0a10;
+        }
+
+        .free-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-start;
+            min-height: 500px;
+        }
+
+        .free-grid.show-ruler {
+            background-image: repeating-linear-gradient(to right, rgba(240,192,64,0.08) 0px, rgba(240,192,64,0.08) 1px, transparent 1px, transparent 40px);
+            background-size: 40px 40px;
+        }
+
+        .free-box {
+            background: #16181f;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+            border: 2px solid #2a2d38;
+            transition: border 0.1s;
+        }
+
+        .free-box.selected {
+            border: 2px solid #f0c040;
+            box-shadow: 0 0 0 3px rgba(240,192,64,0.2);
+        }
+
+        .resize-handle {
+            position: absolute;
+            background: #f0c040;
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            z-index: 20;
+            opacity: 0;
+            transition: 0.1s;
+            pointer-events: none;
+        }
+
+        .free-box.selected .resize-handle {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .handle-right { right: -6px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
+        .handle-bottom { bottom: -6px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+        .handle-corner { bottom: -6px; right: -6px; cursor: nw-resize; }
+
+        .box-content {
+            width: 100%;
+            height: 100%;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .box-content img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+
+        .delete-box {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(230,57,70,0.9);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 90;
+            opacity: 0;
+            transition: 0.1s;
+        }
+
+        .edit-icon {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0,0,0,0.8);
+            color: #f0c040;
+            border: 1px solid #f0c040;
+            border-radius: 30px;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            font-size: 14px;
+            opacity: 0;
+            transition: 0.1s;
+            z-index: 90;
+        }
+
+        .free-box:hover .delete-box,
+        .free-box:hover .edit-icon {
+            opacity: 1;
+        }
+
+        .size-badge {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            background: rgba(0,0,0,0.7);
+            color: #888;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-family: monospace;
+            pointer-events: none;
+            z-index: 90;
+            opacity: 0;
+        }
+
+        .free-box:hover .size-badge { opacity: 1; }
+
+        /* Ranked List Styles */
+        .ranked-banner {
+            width: 100%;
+            border-radius: 12px;
             margin-bottom: 1rem;
         }
 
-        .featured-title {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 3rem;
-            color: #f0c040;
-            margin-bottom: 0.5rem;
-            line-height: 1.2;
+        .ranked-opening {
+            background: rgba(240,192,64,0.1);
+            border-left: 4px solid #f0c040;
+            padding: 0.8rem;
+            margin: 0.5rem 0 1rem 0;
+            font-size: 0.9rem;
+            border-radius: 0 8px 8px 0;
         }
 
-        .featured-meta {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 0.8rem;
+        .rank-item {
+            margin-bottom: 1.5rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .rank-number {
+            background: linear-gradient(135deg, #f0c040, #e63946);
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.2rem;
+            color: #000;
+            border-radius: 0 0 8px 0;
+        }
+
+        .rank-content {
+            padding: 0.8rem;
+        }
+
+        .rank-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #f0c040;
+        }
+
+        .rank-deal {
+            background: #e63946;
+            display: inline-block;
+            padding: 0.1rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin: 0.3rem 0;
+        }
+
+        .rank-image {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+        }
+
+        .rank-conclusion {
+            background: linear-gradient(135deg, rgba(240,192,64,0.1), rgba(0,0,0,0.3));
+            border: 1px solid #f0c040;
+            border-radius: 12px;
+            padding: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: #16181f;
+            border: 1px solid #2a2d38;
+            border-radius: 24px;
+            width: 900px;
+            max-width: 90vw;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #2a2d38;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 { color: #f0c040; margin: 0; font-family: 'Bebas Neue', sans-serif; }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
             color: #888;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
+        }
+
+        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #2a2d38;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn-primary { background: #f0c040; color: #000; }
+        .btn-secondary { background: #2a2d38; color: white; }
+
+        .rank-editor-item {
+            background: #0a0a14;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #2a2d38;
+        }
+
+        .rank-editor-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
             border-bottom: 1px solid #2a2d38;
         }
 
-        .featured-content {
-            font-size: 1rem;
-            line-height: 1.7;
-            color: #ddd;
-        }
-
-        .featured-content img {
-            max-width: 100%;
-            border-radius: 12px;
-            margin: 1rem 0;
-            border: 1px solid #2a2d38;
-        }
-
-        .featured-content h2 {
-            color: #f0c040;
-            margin: 1.5rem 0 0.5rem;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.8rem;
-        }
-
-        .featured-content h3 {
-            color: #f0c040;
-            margin: 1.2rem 0 0.5rem;
-            font-size: 1.3rem;
-        }
-
-        .featured-content ul, .featured-content ol {
-            margin: 0.5rem 0 1rem 1.5rem;
-        }
-
-        .featured-content li {
-            margin-bottom: 0.5rem;
-        }
-
-        .featured-content blockquote {
-            border-left: 4px solid #f0c040;
-            background: rgba(10,10,20,0.6);
-            padding: 0.75rem 1.25rem;
-            margin: 1rem 0;
-            font-style: italic;
-        }
-
-        .list-item {
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            padding: 1rem;
-            margin: 0.8rem 0;
-            display: flex;
-            gap: 1rem;
-            align-items: flex-start;
-        }
-
-        .list-number {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 2rem;
-            color: #f0c040;
-            min-width: 50px;
-        }
-
-        .featured-box {
-            background: linear-gradient(135deg, rgba(240,192,64,0.1), rgba(0,0,0,0.3));
-            border: 2px solid #f0c040;
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin: 1rem 0;
-        }
-
-        .interview-q {
-            color: #f0c040;
+        .rank-number-badge {
+            background: #f0c040;
+            color: #000;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
             font-weight: bold;
-            margin-top: 1.2rem;
-            font-size: 1.1rem;
         }
 
-        .interview-a {
-            margin-left: 1rem;
-            padding-left: 1rem;
-            border-left: 2px solid #f0c040;
-            margin-bottom: 1rem;
-        }
-
-        /* Archive View (past stories) */
-        .archive-view {
-            display: none;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 2rem 1.5rem;
-        }
-
-        .archive-view.show {
-            display: block;
-        }
-
-        .archive-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .archive-back {
-            background: transparent;
-            border: 1.5px solid #2a2d38;
-            border-radius: 8px;
-            padding: 0.45rem 1.2rem;
-            color: #e8e8f0;
-            cursor: pointer;
-            font-family: 'Share Tech Mono', monospace;
-        }
-
-        .archive-back:hover {
-            border-color: #f0c040;
-            color: #f0c040;
-        }
-
-        .archive-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .archive-card {
-            background: rgba(22,24,31,0.9);
-            backdrop-filter: blur(2px);
+        .rank-editor-item input, .rank-editor-item textarea {
+            width: 100%;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: #1a1c26;
             border: 1px solid #2a2d38;
-            border-radius: 12px;
-            padding: 1.2rem;
-            cursor: pointer;
-            transition: all 0.2s;
+            color: white;
+            border-radius: 6px;
+            font-family: inherit;
         }
 
-        .archive-card:hover {
-            transform: translateX(5px);
-            border-color: #f0c040;
-        }
+        #modalRichEditor { height: 400px; }
+        .ql-toolbar.ql-snow { background: #1a1c26; border-color: #2a2d38; }
+        .ql-container.ql-snow { background: #0a0a14; border-color: #2a2d38; color: white; }
+        .ql-editor { color: white; }
 
-        .archive-card-title {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.4rem;
-            color: #f0c040;
-        }
-
-        .archive-card-meta {
-            font-size: 0.75rem;
-            color: #888;
-            margin-top: 0.3rem;
-        }
-
-        /* Admin Panel */
-        .admin-panel {
-            display: none;
+        .login-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             background: rgba(0,0,0,0.98);
-            z-index: 1000;
-            overflow-y: auto;
-            padding: 2rem;
-        }
-
-        .admin-panel.open {
-            display: block;
-        }
-
-        .admin-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: #16181f;
-            border: 1px solid #2a2d38;
-            border-radius: 16px;
-            padding: 1.5rem;
-        }
-
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #2a2d38;
-        }
-
-        .current-featured {
-            background: #0a0a14;
-            border-radius: 8px;
-            padding: 0.8rem;
-            margin-bottom: 1rem;
-            border-left: 4px solid #f0c040;
-        }
-
-        .article-list-item {
-            background: #0a0a14;
-            border-radius: 8px;
-            padding: 0.8rem;
-            margin-bottom: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .publish-btn {
-            background: #00a86b;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 0.3rem 0.8rem;
-            cursor: pointer;
-        }
-
-        .publish-btn.active {
-            background: #f0c040;
-            color: #000;
-        }
-
-        .btn {
-            background: #f0c040;
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            padding: 0.5rem 1.2rem;
-            cursor: pointer;
-            font-family: inherit;
-            font-weight: bold;
-        }
-
-        .btn-danger {
-            background: #e63946;
-            color: white;
-        }
-
-        .btn-secondary {
-            background: #2a2d38;
-            color: #e8e8f0;
-        }
-
-        .drop-zone {
-            border: 2px dashed #2a2d38;
-            border-radius: 12px;
-            padding: 2rem;
-            text-align: center;
-            background: #0a0a14;
-            cursor: pointer;
-            margin-bottom: 1rem;
-        }
-
-        .image-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .image-card {
-            background: #1a1c26;
-            border: 1px solid #2a2d38;
-            border-radius: 8px;
-            padding: 0.5rem;
-            text-align: center;
-        }
-
-        .image-card img {
-            width: 100%;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-
-        .copy-btn {
-            margin-top: 0.5rem;
-            padding: 0.2rem 0.5rem;
-            font-size: 0.7rem;
-            background: #f0c040;
-            color: #000;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .login-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.95);
-            z-index: 1100;
+            z-index: 2000;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .login-modal.hide {
-            display: none;
-        }
+        .login-overlay.hide { display: none; }
 
         .login-box {
             background: #16181f;
             border: 1px solid #2a2d38;
-            border-radius: 16px;
+            border-radius: 24px;
             padding: 2rem;
-            width: 300px;
+            width: 320px;
             text-align: center;
         }
 
         .login-box input {
             width: 100%;
+            padding: 0.6rem;
+            margin: 1rem 0;
             background: #1a1c26;
             border: 1px solid #2a2d38;
-            color: #e8e8f0;
-            padding: 0.6rem;
+            color: white;
             border-radius: 8px;
-            margin: 1rem 0;
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            background: #1a1c26;
-            border: 1px solid #f0c040;
-            padding: 0.75rem 1.2rem;
-            border-radius: 10px;
-            transform: translateY(130%);
-            transition: transform 0.3s;
-            z-index: 1200;
-        }
-
-        .toast.show {
-            transform: translateY(0);
-        }
-
-        footer {
-            background: rgba(0,0,0,0.8);
-            border-top: 1px solid #2a2d38;
-            text-align: center;
-            padding: 1.5rem;
-            font-size: 0.75rem;
-            color: #888;
-            margin-top: 2rem;
-        }
-
-        @media (max-width: 600px) {
-            .hero h1 { font-size: 1.8rem; }
-            .featured-title { font-size: 2rem; }
         }
     </style>
 </head>
 <body>
+<div class="night-sky"></div>
 
-<div class="night-sky" id="nightSky"></div>
-
-<div class="content-wrapper">
-    <div class="blog-header">
-        <div class="logo">Deal<span>Streets</span> // Featured Story</div>
-        <div>
-            <button class="nav-link" onclick="openAdminPanel()">🔐 Admin</button>
-            <a href="https://dealstreets.xyz" class="nav-link">← Back to Promos</a>
-        </div>
-    </div>
-
-    <div class="hero">
-        <h1>📰 Featured Story</h1>
-        <p>The latest feature — new stories published regularly</p>
-    </div>
-
-    <!-- Featured Story View (What visitors see) -->
-    <div id="featuredView" class="featured-view">
-        <div id="featuredContent"></div>
-        <div style="text-align: center; margin-top: 2rem;">
-            <button class="nav-link" onclick="showArchive()">📚 Browse Past Stories →</button>
-        </div>
-    </div>
-
-    <!-- Archive View (Past stories) -->
-    <div id="archiveView" class="archive-view">
-        <div class="archive-header">
-            <button class="archive-back" onclick="showFeatured()">← Back to Current Story</button>
-            <h2 style="font-family:'Bebas Neue'; color:#f0c040;">Past Stories Archive</h2>
-        </div>
-        <div id="archiveList" class="archive-grid"></div>
-    </div>
-
-    <footer>
-        © 2025 DealStreets.xyz — Featured Story Blog
-    </footer>
-</div>
-
-<!-- Login Modal -->
-<div id="loginModal" class="login-modal hide">
+<!-- Login Overlay -->
+<div id="loginOverlay" class="login-overlay">
     <div class="login-box">
-        <h3>🔐 Admin Login</h3>
-        <input type="password" id="adminPassword" placeholder="Enter master code">
-        <button class="btn" onclick="doAdminLogin()">Login</button>
+        <h2 style="color:#f0c040;">🔐 Admin Login</h2>
+        <input type="password" id="adminPasswordInput" placeholder="Enter master code">
+        <button class="btn-primary" onclick="checkAdminLogin()">Login</button>
     </div>
 </div>
 
-<!-- Admin Panel -->
-<div id="adminPanel" class="admin-panel">
-    <div class="admin-container">
-        <div class="admin-header">
-            <h2>🔧 Admin Dashboard</h2>
-            <button class="btn btn-secondary" onclick="closeAdminPanel()">Close</button>
+<!-- Visitor View (what everyone sees) -->
+<div id="visitorView" class="visitor-view">
+    <div class="visitor-header">
+        <div class="visitor-logo">Deal<span>Streets</span> // Featured Story</div>
+        <div>
+            <button class="btn-publish" onclick="showAdminLoginFromVisitor()">🔐 Admin</button>
+            <a href="https://dealstreets.xyz" style="text-decoration:none; margin-left:0.5rem;"><button class="btn-secondary">← Back to Promos</button></a>
         </div>
-        
-        <div class="current-featured">
-            <strong>⭐ Currently Featured:</strong> <span id="currentFeaturedName">None</span>
-        </div>
-        
-        <div style="margin-bottom: 1rem;">
-            <button class="btn" onclick="showArticleEditor()">+ Write New Story</button>
-        </div>
-        
-        <h3>All Stories</h3>
-        <div id="articlesAdminList"></div>
-        
-        <hr style="border-color:#2a2d38; margin: 1.5rem 0;">
-        
-        <h3>📸 Image Uploader</h3>
-        <div class="drop-zone" id="dropZone" onclick="document.getElementById('imageUpload').click()">
-            📸 Drag & drop images here or click to upload
-            <input type="file" id="imageUpload" accept="image/*" multiple style="display:none">
-        </div>
-        <div id="imageGallery" class="image-grid"></div>
     </div>
+    <div id="visitorContent" class="visitor-content"></div>
 </div>
 
-<!-- Article Editor Modal -->
-<div id="articleEditorModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.98); z-index:1100; overflow-y:auto; padding:2rem;">
-    <div style="max-width:900px; margin:0 auto; background:#16181f; border-radius:16px; padding:1.5rem;">
-        <h2 id="editorTitle">Write New Story</h2>
-        <input type="text" id="editArticleId" style="display:none;">
-        <input type="text" id="editTitle" placeholder="Story Title" style="width:100%; margin-bottom:0.5rem; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
-        <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
-            <input type="text" id="editDate" placeholder="Date (e.g., May 27, 2025)" style="flex:1; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
-            <input type="text" id="editAuthor" placeholder="Author" style="flex:1; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
-            <input type="text" id="editCategory" placeholder="Category" style="flex:1; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
-        </div>
-        <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
-            <select id="editTemplateType" style="flex:1; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
-                <option value="blank">📄 Blank Canvas (Full HTML control)</option>
-                <option value="standard">📝 Standard Article</option>
-                <option value="list">📊 Top List</option>
-                <option value="featured">⭐ Featured Product</option>
-                <option value="interview">🎤 Interview</option>
-            </select>
-        </div>
-        <textarea id="editExcerpt" placeholder="Short excerpt (shown in archive only)" rows="2" style="width:100%; margin-bottom:0.5rem; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;"></textarea>
+<!-- Admin Builder View -->
+<div id="adminView" class="app" style="display:none;">
+    <div class="toolbox">
+        <h2>📦 Block Builder</h2>
         
-        <div id="templateFields"></div>
-        
-        <div style="display:flex; gap:0.5rem; margin-top:1rem;">
-            <button class="btn" onclick="saveArticle()">Save as Draft</button>
-            <button class="btn" style="background:#00a86b;" onclick="saveAndPublish()">Save & Publish Now</button>
-            <button class="btn btn-secondary" onclick="closeArticleEditor()">Cancel</button>
+        <div class="drag-item text" draggable="true" data-type="text">
+            <span class="drag-icon">📝</span> Text Block
+        </div>
+        <div class="drag-item image" draggable="true" data-type="image">
+            <span class="drag-icon">🖼️</span> Image Block
+        </div>
+        <div class="drag-item video" draggable="true" data-type="video">
+            <span class="drag-icon">🎬</span> Video Block
+        </div>
+        <div class="drag-item ranked" draggable="true" data-type="ranked">
+            <span class="drag-icon">🏆</span> Ranked List Block
+        </div>
+
+        <div class="folder-drop-zone" id="folderDropZone">
+            📁 <strong>DRAG IMAGES FROM FOLDER</strong><br>
+            <small>Open folder → select images → drag here</small>
+        </div>
+
+        <div class="info-text">
+            ⚡ <strong>Ranked List:</strong> Drop onto canvas → click ✎ to edit
+        </div>
+        <button class="btn-logout" onclick="adminLogout()" style="margin-top:10px;">🚪 Logout</button>
+    </div>
+
+    <div class="canvas-area">
+        <div class="canvas-header">
+            <h3>📄 Your Blog Canvas</h3>
+            <div class="canvas-controls">
+                <button id="toggleRulerBtn" class="btn-ruler">📏 Show Grid</button>
+                <button id="previewModeBtn" class="btn-preview">👁️ Preview OFF</button>
+                <button id="saveDraftBtn" class="btn-save">💾 Save Draft</button>
+                <button id="publishBtn" class="btn-publish">⭐ Publish</button>
+                <button id="resetCanvasBtn" class="btn-reset">🔄 Reset</button>
+            </div>
+        </div>
+        <div class="grid-container">
+            <div id="freeGrid" class="free-grid"></div>
         </div>
     </div>
 </div>
 
-<div id="toast" class="toast">✅ <span id="toastMsg"></span></div>
+<!-- Ranked Editor Modal -->
+<div id="rankedModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>🏆 Edit Ranked List</h3>
+            <button class="modal-close" id="closeRankedModal">&times;</button>
+        </div>
+        <div class="modal-body" id="rankedModalBody"></div>
+        <div class="modal-footer">
+            <button class="btn-secondary" id="cancelRankedEdit">Cancel</button>
+            <button class="btn-primary" id="saveRankedList">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- Text Editor Modal -->
+<div id="textModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>✏️ Edit Text</h3>
+            <button class="modal-close" id="closeTextModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="modalRichEditor"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" id="cancelTextEdit">Cancel</button>
+            <button class="btn-primary" id="saveTextEdit">Save</button>
+        </div>
+    </div>
+</div>
 
 <script>
     const MASTER_CODE = 'DealStreetsMaster2025!';
     let adminLoggedIn = false;
-    let uploadedImages = [];
-    let articles = [];
-    let publishedStoryId = null;  // The ID of the currently featured story
-    
-    // Load data from localStorage
-    function loadData() {
-        const savedArticles = localStorage.getItem('blog_articles');
-        if (savedArticles) articles = JSON.parse(savedArticles);
-        else articles = [];
-        
-        const savedPublished = localStorage.getItem('blog_published_id');
-        publishedStoryId = savedPublished || null;
-        
-        const savedImages = localStorage.getItem('blog_images');
-        if (savedImages) uploadedImages = JSON.parse(savedImages);
-        else uploadedImages = [];
-        
-        renderForVisitors();
-        if (adminLoggedIn) renderAdminList();
-    }
-    
-    function saveData() {
-        localStorage.setItem('blog_articles', JSON.stringify(articles));
-        localStorage.setItem('blog_published_id', publishedStoryId || '');
-        renderForVisitors();
-        if (adminLoggedIn) renderAdminList();
-    }
-    
-    function showToast(msg) {
-        document.getElementById('toastMsg').innerText = msg;
-        document.getElementById('toast').classList.add('show');
-        setTimeout(() => document.getElementById('toast').classList.remove('show'), 3000);
-    }
-    
-    // Render what visitors see
-    function renderForVisitors() {
-        const publishedArticle = articles.find(a => a.id === publishedStoryId);
-        const featuredContainer = document.getElementById('featuredContent');
-        
-        if (publishedArticle) {
-            featuredContainer.innerHTML = `
-                <div class="featured-badge">⭐ CURRENT FEATURED STORY</div>
-                <h1 class="featured-title">${escapeHtml(publishedArticle.title)}</h1>
-                <div class="featured-meta">
-                    📅 ${publishedArticle.date} | ✍️ ${escapeHtml(publishedArticle.author)} | 🏷️ ${escapeHtml(publishedArticle.category)}
-                </div>
-                <div class="featured-content">
-                    ${renderTemplateContent(publishedArticle)}
-                </div>
-            `;
-        } else {
-            featuredContainer.innerHTML = `
-                <div style="text-align: center; padding: 3rem;">
-                    <div style="font-size: 4rem;">📭</div>
-                    <h2>No Featured Story Yet</h2>
-                    <p>Check back soon for the latest feature!</p>
-                    ${adminLoggedIn ? '<button class="btn" onclick="showArticleEditor()" style="margin-top:1rem;">+ Write First Story</button>' : ''}
-                </div>
-            `;
-        }
-    }
-    
-    function renderTemplateContent(article) {
-        switch(article.templateType) {
-            case 'blank':
-                return article.customHtml || '<p><em>No content yet.</em></p>';
-            case 'list':
-                let items = (article.listItems || []).map((item, idx) => `<div class="list-item"><div class="list-number">${idx+1}</div><div><strong>${escapeHtml(item.name)}</strong><br><span style="color:#f0c040;">🔥 ${escapeHtml(item.deal)}</span><br><span style="font-size:0.85rem;">${escapeHtml(item.note || '')}</span></div></div>`).join('');
-                return `${items}${article.conclusion ? `<div class="featured-box">💡 ${escapeHtml(article.conclusion)}</div>` : ''}`;
-            case 'featured':
-                let pros = (article.pros || []).map(p => `<li>✅ ${escapeHtml(p)}</li>`).join('');
-                let cons = (article.cons || []).map(c => `<li>❌ ${escapeHtml(c)}</li>`).join('');
-                return `<div class="featured-box"><strong>💰 Price:</strong> ${escapeHtml(article.productPrice || '')}</div>
-                        <h2>👍 Pros</h2><ul>${pros}</ul><h2>👎 Cons</h2><ul>${cons}</ul>
-                        <div class="featured-box"><strong>🏆 Verdict:</strong> ${escapeHtml(article.finalVerdict || '')}</div>`;
-            case 'interview':
-                let qa = (article.questions || []).map(q => `<div class="interview-q">🎤 Q: ${escapeHtml(q.q)}</div><div class="interview-a">💬 A: ${escapeHtml(q.a)}</div>`).join('');
-                return `<div class="featured-box"><strong>👤 Guest:</strong> ${escapeHtml(article.guestName || '')}</div>${qa}${article.closingNote ? `<div class="featured-box">📌 ${escapeHtml(article.closingNote)}</div>` : ''}`;
-            default:
-                let sections = (article.sections || []).map(s => `<h2>${escapeHtml(s.heading)}</h2>${s.content}`).join('');
-                return sections;
-        }
-    }
-    
-    // Archive view
-    function showArchive() {
-        const archiveList = articles.filter(a => a.id !== publishedStoryId).reverse();
-        const container = document.getElementById('archiveList');
-        
-        if (archiveList.length === 0) {
-            container.innerHTML = '<div style="text-align:center; padding:2rem; color:#888;">No past stories yet. Check back later!</div>';
-        } else {
-            container.innerHTML = archiveList.map(article => `
-                <div class="archive-card" onclick="viewArchivedStory('${article.id}')">
-                    <div class="archive-card-title">${escapeHtml(article.title)}</div>
-                    <div class="archive-card-meta">📅 ${article.date} | ✍️ ${escapeHtml(article.author)}</div>
-                    <div style="font-size:0.85rem; color:#aaa; margin-top:0.5rem;">${escapeHtml(article.excerpt)}</div>
-                </div>
-            `).join('');
-        }
-        
-        document.getElementById('featuredView').classList.add('hide');
-        document.getElementById('archiveView').classList.add('show');
-    }
-    
-    function showFeatured() {
-        document.getElementById('featuredView').classList.remove('hide');
-        document.getElementById('archiveView').classList.remove('show');
-    }
-    
-    function viewArchivedStory(articleId) {
-        const article = articles.find(a => a.id === articleId);
-        if (!article) return;
-        
-        // Show archived story in a modal-style view
-        const modal = document.createElement('div');
-        modal.style.cssText = 'position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.98); z-index:2000; overflow-y:auto; padding:2rem;';
-        modal.innerHTML = `
-            <div style="max-width:900px; margin:0 auto; background:#16181f; border-radius:16px; padding:1.5rem;">
-                <div style="display:flex; justify-content:flex-end;">
-                    <button onclick="this.closest('div').remove()" style="background:#e63946; border:none; color:white; padding:0.3rem 0.8rem; border-radius:6px; cursor:pointer;">✕ Close</button>
-                </div>
-                <div class="featured-badge" style="margin-top:0.5rem;">📚 ARCHIVED STORY</div>
-                <h1 class="featured-title" style="font-size:2rem;">${escapeHtml(article.title)}</h1>
-                <div class="featured-meta">📅 ${article.date} | ✍️ ${escapeHtml(article.author)} | 🏷️ ${escapeHtml(article.category)}</div>
-                <div class="featured-content">${renderTemplateContent(article)}</div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-        modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
-    }
-    
-    // Admin functions
-    function openAdminPanel() {
-        if (adminLoggedIn) {
-            document.getElementById('adminPanel').classList.add('open');
-            renderAdminList();
-            renderImageGallery();
-        } else {
-            document.getElementById('loginModal').classList.remove('hide');
-        }
-    }
-    
-    function closeAdminPanel() {
-        document.getElementById('adminPanel').classList.remove('open');
-    }
-    
-    function doAdminLogin() {
-        const pwd = document.getElementById('adminPassword').value;
-        if (pwd === MASTER_CODE) {
-            adminLoggedIn = true;
-            document.getElementById('loginModal').classList.add('hide');
-            openAdminPanel();
-            showToast('Logged in');
-            renderForVisitors(); // Show admin buttons if needed
-        } else {
-            showToast('Invalid code');
-        }
-    }
-    
-    function renderAdminList() {
-        const container = document.getElementById('articlesAdminList');
-        const publishedArticle = articles.find(a => a.id === publishedStoryId);
-        document.getElementById('currentFeaturedName').innerText = publishedArticle ? publishedArticle.title : 'None';
-        
-        if (articles.length === 0) {
-            container.innerHTML = '<p style="color:#888;">No stories yet. Click "Write New Story" to create your first feature.</p>';
-            return;
-        }
-        
-        container.innerHTML = articles.map(article => `
-            <div class="article-list-item">
-                <div>
-                    <strong>${escapeHtml(article.title)}</strong>
-                    <span style="color:#888; font-size:0.75rem; margin-left:0.5rem;">${article.templateType}</span>
-                    <div style="font-size:0.7rem; color:#666;">${article.date}</div>
-                </div>
-                <div style="display:flex; gap:0.5rem;">
-                    <button class="publish-btn ${publishedStoryId === article.id ? 'active' : ''}" onclick="setPublished('${article.id}')">
-                        ${publishedStoryId === article.id ? '⭐ Featured' : 'Publish'}
-                    </button>
-                    <button class="btn-secondary" style="padding:0.3rem 0.8rem;" onclick="editArticle('${article.id}')">Edit</button>
-                    <button class="btn-danger" style="padding:0.3rem 0.8rem;" onclick="deleteArticle('${article.id}')">Delete</button>
-                </div>
-            </div>
-        `).join('');
-    }
-    
-    function setPublished(articleId) {
-        publishedStoryId = articleId;
-        saveData();
-        renderAdminList();
-        showToast('Story published! Visitors will now see this as the Featured Story.');
-    }
-    
-    function showArticleEditor(articleId = null) {
-        const article = articleId ? articles.find(a => a.id === articleId) : null;
-        document.getElementById('editorTitle').innerText = article ? 'Edit Story' : 'Write New Story';
-        document.getElementById('editArticleId').value = articleId || '';
-        document.getElementById('editTitle').value = article?.title || '';
-        document.getElementById('editDate').value = article?.date || new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-        document.getElementById('editAuthor').value = article?.author || 'DealStreets Team';
-        document.getElementById('editCategory').value = article?.category || '';
-        document.getElementById('editExcerpt').value = article?.excerpt || '';
-        document.getElementById('editTemplateType').value = article?.templateType || 'blank';
-        updateTemplateFields(article);
-        document.getElementById('articleEditorModal').style.display = 'block';
-    }
-    
-    function updateTemplateFields(article) {
-        const container = document.getElementById('templateFields');
-        const type = document.getElementById('editTemplateType').value;
-        if (type === 'blank') {
-            container.innerHTML = `<textarea id="editCustomHtml" placeholder="Custom HTML content (full freedom)" rows="10" style="width:100%; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${escapeHtml(article?.customHtml || '')}</textarea>`;
-        } else if (type === 'list') {
-            container.innerHTML = `<textarea id="editListItems" placeholder='JSON array: [{"name":"Item","deal":"50% off","note":"optional"}]' rows="6" style="width:100%; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${JSON.stringify(article?.listItems || [{name:"Example",deal:"50% off"}], null, 2)}</textarea>
-                                    <input type="text" id="editConclusion" placeholder="Conclusion" value="${escapeHtml(article?.conclusion || '')}" style="width:100%; margin-top:0.5rem; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">`;
-        } else if (type === 'featured') {
-            container.innerHTML = `<input type="text" id="editProductPrice" placeholder="Price" value="${escapeHtml(article?.productPrice || '')}" style="width:100%; margin-bottom:0.5rem; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
-                                    <textarea id="editPros" placeholder='Pros (JSON array)' rows="3" style="width:100%; margin-bottom:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${JSON.stringify(article?.pros || [], null, 2)}</textarea>
-                                    <textarea id="editCons" placeholder='Cons (JSON array)' rows="3" style="width:100%; margin-bottom:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${JSON.stringify(article?.cons || [], null, 2)}</textarea>
-                                    <input type="text" id="editFinalVerdict" placeholder="Final Verdict" value="${escapeHtml(article?.finalVerdict || '')}" style="width:100%; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">`;
-        } else if (type === 'interview') {
-            container.innerHTML = `<input type="text" id="editGuestName" placeholder="Guest Name" value="${escapeHtml(article?.guestName || '')}" style="width:100%; margin-bottom:0.5rem; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
-                                    <textarea id="editQuestions" placeholder='Questions/Answers JSON: [{"q":"Question?","a":"Answer"}]' rows="6" style="width:100%; margin-bottom:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${JSON.stringify(article?.questions || [], null, 2)}</textarea>
-                                    <input type="text" id="editClosingNote" placeholder="Closing Note" value="${escapeHtml(article?.closingNote || '')}" style="width:100%; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">`;
-        } else {
-            container.innerHTML = `<textarea id="editSections" placeholder='Sections JSON: [{"heading":"Title","content":"<p>HTML</p>"}]' rows="8" style="width:100%; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${JSON.stringify(article?.sections || [], null, 2)}</textarea>`;
-        }
-    }
-    
-    document.getElementById('editTemplateType').addEventListener('change', () => updateTemplateFields(null));
-    
-    function saveArticle(publish = false) {
-        const id = document.getElementById('editArticleId').value;
-        const templateType = document.getElementById('editTemplateType').value;
-        let article = {
-            id: id || Date.now().toString(),
-            title: document.getElementById('editTitle').value,
-            date: document.getElementById('editDate').value,
-            author: document.getElementById('editAuthor').value,
-            category: document.getElementById('editCategory').value,
-            templateType: templateType,
-            excerpt: document.getElementById('editExcerpt').value
-        };
-        
-        if (templateType === 'blank') {
-            article.customHtml = document.getElementById('editCustomHtml')?.value || '';
-        } else if (templateType === 'list') {
-            try { article.listItems = JSON.parse(document.getElementById('editListItems')?.value || '[]'); } catch(e) { article.listItems = []; }
-            article.conclusion = document.getElementById('editConclusion')?.value || '';
-        } else if (templateType === 'featured') {
-            article.productPrice = document.getElementById('editProductPrice')?.value || '';
-            try { article.pros = JSON.parse(document.getElementById('editPros')?.value || '[]'); } catch(e) { article.pros = []; }
-            try { article.cons = JSON.parse(document.getElementById('editCons')?.value || '[]'); } catch(e) { article.cons = []; }
-            article.finalVerdict = document.getElementById('editFinalVerdict')?.value || '';
-        } else if (templateType === 'interview') {
-            article.guestName = document.getElementById('editGuestName')?.value || '';
-            try { article.questions = JSON.parse(document.getElementById('editQuestions')?.value || '[]'); } catch(e) { article.questions = []; }
-            article.closingNote = document.getElementById('editClosingNote')?.value || '';
-        } else {
-            try { article.sections = JSON.parse(document.getElementById('editSections')?.value || '[]'); } catch(e) { article.sections = []; }
-        }
-        
-        if (id) {
-            const index = articles.findIndex(a => a.id === id);
-            if (index !== -1) articles[index] = article;
-        } else {
-            articles.unshift(article);
-        }
-        
-        if (publish) {
-            publishedStoryId = article.id;
-            showToast('Story published and featured!');
-        } else {
-            showToast('Draft saved');
-        }
-        
-        saveData();
-        closeArticleEditor();
-    }
-    
-    function saveAndPublish() {
-        saveArticle(true);
-    }
-    
-    function deleteArticle(id) {
-        if (confirm('Delete this story?')) {
-            articles = articles.filter(a => a.id !== id);
-            if (publishedStoryId === id) publishedStoryId = null;
-            saveData();
-            renderAdminList();
-            showToast('Story deleted');
-        }
-    }
-    
-    function editArticle(id) {
-        showArticleEditor(id);
-    }
-    
-    function closeArticleEditor() {
-        document.getElementById('articleEditorModal').style.display = 'none';
-    }
-    
-    // Image upload functions
-    function renderImageGallery() {
-        const gallery = document.getElementById('imageGallery');
-        if (!gallery) return;
-        gallery.innerHTML = uploadedImages.map((img, idx) => `
-            <div class="image-card">
-                <img src="${img.url}" alt="${img.name}">
-                <div style="font-size:0.7rem; word-break:break-all;">${img.name}</div>
-                <button class="copy-btn" onclick="copyToClipboard('${img.url}')">Copy URL</button>
-                <button class="copy-btn" style="background:#e63946;" onclick="deleteImage(${idx})">Delete</button>
-            </div>
-        `).join('');
-        if (!uploadedImages.length) gallery.innerHTML = '<p style="text-align:center; grid-column:1/-1;">No images uploaded. Drag & drop some here.</p>';
-    }
-    
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text);
-        showToast('Image URL copied!');
-    }
-    
-    function deleteImage(idx) {
-        uploadedImages.splice(idx, 1);
-        localStorage.setItem('blog_images', JSON.stringify(uploadedImages));
-        renderImageGallery();
-        showToast('Image deleted');
-    }
-    
-    function handleImageUpload(files) {
-        Array.from(files).forEach(file => {
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    uploadedImages.push({ url: e.target.result, name: file.name, size: file.size });
-                    localStorage.setItem('blog_images', JSON.stringify(uploadedImages));
-                    renderImageGallery();
-                    showToast(`${file.name} uploaded`);
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-    }
-    
+    let boxes = [];
+    let nextId = 1;
+    let previewMode = false;
+    let rulerVisible = false;
+    let selectedBoxId = null;
+    let currentEditingBoxId = null;
+    let currentEditingRankedData = null;
+    let modalQuill = null;
+    let sortableInstance = null;
+
+    // Helper functions
     function escapeHtml(str) {
         if (!str) return '';
         return String(str).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
     }
-    
-    // Setup drag & drop
-    const dropZone = document.getElementById('dropZone');
-    if (dropZone) {
-        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-        dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleImageUpload(e.dataTransfer.files); });
-        document.getElementById('imageUpload')?.addEventListener('change', e => handleImageUpload(e.target.files));
+
+    // Default ranked data
+    function getDefaultRankedData() {
+        return {
+            rankCount: 10,
+            bannerImage: '',
+            openingStatement: 'Here are the top deals you need to know about...',
+            items: [],
+            conclusion: 'Don\'t miss out on these amazing offers!'
+        };
     }
-    
-    // Night sky animation
-    function createNightSky() {
-        const sky = document.getElementById('nightSky');
-        for (let i = 0; i < 200; i++) {
-            const star = document.createElement('div');
-            star.classList.add('star');
-            star.style.left = Math.random() * 100 + '%';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.width = Math.random() * 2 + 1 + 'px';
-            star.style.height = star.style.width;
-            star.style.animationDelay = Math.random() * 5 + 's';
-            star.style.animationDuration = 2 + Math.random() * 3 + 's';
-            sky.appendChild(star);
+
+    function generateRankedItems(rankCount, existingItems = []) {
+        const items = [];
+        for (let i = rankCount; i >= 1; i--) {
+            const existing = existingItems.find(item => item.rank === i);
+            items.push({
+                rank: i,
+                title: existing?.title || `Item #${i}`,
+                deal: existing?.deal || '',
+                image: existing?.image || '',
+                description: existing?.description || `Description for #${i}`
+            });
         }
-        setInterval(() => {
-            const shooting = document.createElement('div');
-            shooting.classList.add('shooting-star');
-            shooting.style.left = Math.random() * 60 + 20 + '%';
-            shooting.style.top = Math.random() * 30 + '%';
-            shooting.style.animationDuration = 3 + Math.random() * 2 + 's';
-            sky.appendChild(shooting);
-            setTimeout(() => shooting.remove(), 5000);
-        }, 8000);
+        return items;
     }
+
+    function renderRankedBlock(data) {
+        if (!data.items || data.items.length === 0) {
+            data.items = generateRankedItems(data.rankCount || 10, []);
+        }
+        
+        let itemsHtml = data.items.map(item => `
+            <div class="rank-item">
+                <div class="rank-number">#${item.rank}</div>
+                <div class="rank-content">
+                    <div class="rank-title">${escapeHtml(item.title)}</div>
+                    ${item.deal ? `<div class="rank-deal">🔥 ${escapeHtml(item.deal)}</div>` : ''}
+                    ${item.image ? `<img class="rank-image" src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}">` : ''}
+                    <div class="rank-description">${escapeHtml(item.description)}</div>
+                </div>
+            </div>
+        `).join('');
+        
+        return `
+            ${data.bannerImage ? `<img class="ranked-banner" src="${escapeHtml(data.bannerImage)}" alt="Banner">` : ''}
+            ${data.openingStatement ? `<div class="ranked-opening">${escapeHtml(data.openingStatement)}</div>` : ''}
+            <h3 style="color:#f0c040; margin:0.5rem 0;">The List</h3>
+            ${itemsHtml}
+            ${data.conclusion ? `<div class="rank-conclusion">${escapeHtml(data.conclusion)}</div>` : ''}
+        `;
+    }
+
+    function renderBoxForAdmin(box) {
+        let contentHtml = '';
+        if (box.type === 'text') {
+            contentHtml = `<div class="box-content">${box.content || '<p><em>Click ✎ to edit</em></p>'}</div>`;
+        } else if (box.type === 'image') {
+            contentHtml = `<div class="box-content"><img src="${box.content}" alt="image" draggable="false"></div>`;
+        } else if (box.type === 'video') {
+            contentHtml = `<div class="box-content">${getVideoHtml(box.content)}</div>`;
+        } else if (box.type === 'ranked') {
+            contentHtml = `<div class="box-content">${renderRankedBlock(box.rankedData || getDefaultRankedData())}</div>`;
+        }
+        
+        const selectedClass = (selectedBoxId === box.id) ? 'selected' : '';
+        return `
+            <div class="free-box ${selectedClass}" data-id="${box.id}" data-type="${box.type}" style="width: ${box.width}px; height: ${box.height}px;">
+                <button class="delete-box" data-id="${box.id}">✕</button>
+                <button class="edit-icon" data-id="${box.id}" data-type="${box.type}">✎</button>
+                <div class="resize-handle handle-right" data-id="${box.id}"></div>
+                <div class="resize-handle handle-bottom" data-id="${box.id}"></div>
+                <div class="resize-handle handle-corner" data-id="${box.id}"></div>
+                <div class="size-badge">${box.width} × ${box.height}</div>
+                ${contentHtml}
+            </div>
+        `;
+    }
+
+    function renderBoxForVisitor(box) {
+        let contentHtml = '';
+        if (box.type === 'text') {
+            contentHtml = `<div class="box-content">${box.content || ''}</div>`;
+        } else if (box.type === 'image') {
+            contentHtml = `<div class="box-content"><img src="${box.content}" alt="image"></div>`;
+        } else if (box.type === 'video') {
+            contentHtml = `<div class="box-content">${getVideoHtml(box.content)}</div>`;
+        } else if (box.type === 'ranked') {
+            contentHtml = `<div class="box-content">${renderRankedBlock(box.rankedData || getDefaultRankedData())}</div>`;
+        }
+        
+        return `
+            <div class="visitor-block" style="width:100%;">
+                ${contentHtml}
+            </div>
+        `;
+    }
+
+    function getVideoHtml(url) {
+        if (!url) return '<p>🎬 Add video URL</p>';
+        const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^"&?\/\s]{11})/);
+        if (ytMatch) return `<iframe src="https://www.youtube.com/embed/${ytMatch[1]}" frameborder="0" allowfullscreen style="width:100%; height:300px; border-radius:12px;"></iframe>`;
+        if (url.match(/\.(mp4|webm|gif)$/i)) {
+            return `<video controls autoplay loop muted style="width:100%; border-radius:12px;"><source src="${url}"></video>`;
+        }
+        return `<img src="${url}" style="width:100%; border-radius:12px;">`;
+    }
+
+    function renderVisitorView() {
+        const container = document.getElementById('visitorContent');
+        if (!boxes.length) {
+            container.innerHTML = '<div style="text-align:center; padding:3rem;">No featured story yet. Check back soon!</div>';
+            return;
+        }
+        container.innerHTML = boxes.map(box => renderBoxForVisitor(box)).join('');
+    }
+
+    function renderAdminCanvas() {
+        if (boxes.length === 0) {
+            document.getElementById('freeGrid').innerHTML = '<div class="empty-canvas">✨ Drag blocks from the left to build your featured story!</div>';
+            return;
+        }
+        document.getElementById('freeGrid').innerHTML = '';
+        boxes.forEach(box => {
+            document.getElementById('freeGrid').insertAdjacentHTML('beforeend', renderBoxForAdmin(box));
+        });
+        attachAdminEvents();
+        setupResizeHandles();
+        if (previewMode) document.querySelector('.canvas-area').classList.add('preview-mode');
+        else document.querySelector('.canvas-area').classList.remove('preview-mode');
+        initDragSort();
+    }
+
+    function attachAdminEvents() {
+        document.querySelectorAll('.delete-box').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                boxes = boxes.filter(b => b.id !== parseInt(btn.dataset.id));
+                if (selectedBoxId === parseInt(btn.dataset.id)) selectedBoxId = null;
+                renderAdminCanvas();
+            });
+        });
+        
+        document.querySelectorAll('.edit-icon').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = parseInt(btn.dataset.id);
+                const box = boxes.find(b => b.id === id);
+                if (!box) return;
+                
+                if (box.type === 'text') {
+                    openTextEditor(id);
+                } else if (box.type === 'image') {
+                    const newUrl = prompt('🖼️ Enter image URL:', box.content);
+                    if (newUrl !== null) box.content = newUrl;
+                    renderAdminCanvas();
+                    selectedBoxId = id;
+                } else if (box.type === 'video') {
+                    const newUrl = prompt('🎬 Enter video/GIF/YouTube URL:', box.content);
+                    if (newUrl !== null) box.content = newUrl;
+                    renderAdminCanvas();
+                    selectedBoxId = id;
+                } else if (box.type === 'ranked') {
+                    openRankedEditor(id);
+                }
+            });
+        });
+        
+        document.querySelectorAll('.free-box').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if (e.target.classList.contains('delete-box') || e.target.classList.contains('edit-icon')) return;
+                selectedBoxId = parseInt(el.dataset.id);
+                renderAdminCanvas();
+            });
+        });
+    }
+
+    // Ranked Editor
+    function openRankedEditor(boxId) {
+        const box = boxes.find(b => b.id === boxId);
+        if (!box || box.type !== 'ranked') return;
+        currentEditingBoxId = boxId;
+        const data = box.rankedData || getDefaultRankedData();
+        currentEditingRankedData = JSON.parse(JSON.stringify(data));
+        renderRankedEditorModal();
+        document.getElementById('rankedModal').classList.add('active');
+    }
+
+    function renderRankedEditorModal() {
+        const container = document.getElementById('rankedModalBody');
+        const data = currentEditingRankedData;
+        
+        let itemsHtml = '';
+        for (let i = data.rankCount; i >= 1; i--) {
+            const item = data.items.find(it => it.rank === i) || { rank: i, title: '', deal: '', image: '', description: '' };
+            itemsHtml += `
+                <div class="rank-editor-item">
+                    <div class="rank-editor-header">
+                        <span class="rank-number-badge">#${i}</span>
+                    </div>
+                    <input type="text" id="rank_title_${i}" placeholder="Item Title" value="${escapeHtml(item.title)}">
+                    <input type="text" id="rank_deal_${i}" placeholder="Deal / Price / Discount" value="${escapeHtml(item.deal)}">
+                    <input type="text" id="rank_image_${i}" placeholder="Image URL" value="${escapeHtml(item.image)}">
+                    <textarea id="rank_desc_${i}" placeholder="Description" rows="2">${escapeHtml(item.description)}</textarea>
+                </div>
+            `;
+        }
+        
+        container.innerHTML = `
+            <div style="margin-bottom:1rem;">
+                <label style="color:#888;">Number of Items:</label>
+                <select id="rankCountSelect" style="width:100%; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;" onchange="updateRankCount()">
+                    <option value="3" ${data.rankCount === 3 ? 'selected' : ''}>Top 3</option>
+                    <option value="5" ${data.rankCount === 5 ? 'selected' : ''}>Top 5</option>
+                    <option value="6" ${data.rankCount === 6 ? 'selected' : ''}>Top 6</option>
+                    <option value="8" ${data.rankCount === 8 ? 'selected' : ''}>Top 8</option>
+                    <option value="10" ${data.rankCount === 10 ? 'selected' : ''}>Top 10</option>
+                    <option value="12" ${data.rankCount === 12 ? 'selected' : ''}>Top 12</option>
+                    <option value="15" ${data.rankCount === 15 ? 'selected' : ''}>Top 15</option>
+                    <option value="20" ${data.rankCount === 20 ? 'selected' : ''}>Top 20</option>
+                </select>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="color:#888;">Banner Image URL:</label>
+                <input type="text" id="rankBannerImage" placeholder="Paste image URL" value="${escapeHtml(data.bannerImage)}" style="width:100%; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
+            </div>
+            <div style="margin-bottom:1rem;">
+                <label style="color:#888;">Opening Statement:</label>
+                <textarea id="rankOpening" rows="3" style="width:100%; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">${escapeHtml(data.openingStatement)}</textarea>
+            </div>
+            <div id="rankedEditorItems">${itemsHtml}</div>
+            <div style="margin-bottom:1rem;">
+                <label style="color:#888;">Conclusion:</label>
+                <textarea id="rankConclusion" rows="3" style="width:100%; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">${escapeHtml(data.conclusion)}</textarea>
+            </div>
+        `;
+    }
+
+    window.updateRankCount = function() {
+        const newCount = parseInt(document.getElementById('rankCountSelect').value);
+        currentEditingRankedData.rankCount = newCount;
+        const newItems = [];
+        for (let i = newCount; i >= 1; i--) {
+            const existing = currentEditingRankedData.items.find(it => it.rank === i);
+            newItems.push({
+                rank: i,
+                title: existing?.title || `Item #${i}`,
+                deal: existing?.deal || '',
+                image: existing?.image || '',
+                description: existing?.description || ''
+            });
+        }
+        currentEditingRankedData.items = newItems;
+        renderRankedEditorModal();
+    };
+
+    function saveRankedList() {
+        if (currentEditingBoxId === null) return;
+        const newRankCount = parseInt(document.getElementById('rankCountSelect').value);
+        const newItems = [];
+        for (let i = newRankCount; i >= 1; i--) {
+            newItems.push({
+                rank: i,
+                title: document.getElementById(`rank_title_${i}`)?.value || '',
+                deal: document.getElementById(`rank_deal_${i}`)?.value || '',
+                image: document.getElementById(`rank_image_${i}`)?.value || '',
+                description: document.getElementById(`rank_desc_${i}`)?.value || ''
+            });
+        }
+        const updatedData = {
+            rankCount: newRankCount,
+            bannerImage: document.getElementById('rankBannerImage')?.value || '',
+            openingStatement: document.getElementById('rankOpening')?.value || '',
+            items: newItems,
+            conclusion: document.getElementById('rankConclusion')?.value || ''
+        };
+        const box = boxes.find(b => b.id === currentEditingBoxId);
+        if (box) {
+            box.rankedData = updatedData;
+            renderAdminCanvas();
+            selectedBoxId = currentEditingBoxId;
+        }
+        document.getElementById('rankedModal').classList.remove('active');
+        currentEditingBoxId = null;
+    }
+
+    // Text Editor
+    function initModalQuill() {
+        if (modalQuill) return;
+        modalQuill = new Quill('#modalRichEditor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'font': ['Arial', 'Times New Roman', 'Courier New', 'Georgia', 'Verdana', 'Impact'] }],
+                    [{ 'size': ['12px', '14px', '16px', '18px', '24px', '32px', '48px'] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'header': [1, 2, 3, false] }],
+                    [{ 'align': [] }],
+                    ['blockquote', 'code-block'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link', 'image']
+                ]
+            }
+        });
+    }
+
+    function openTextEditor(boxId) {
+        const box = boxes.find(b => b.id === boxId);
+        if (!box || box.type !== 'text') return;
+        currentEditingBoxId = boxId;
+        initModalQuill();
+        modalQuill.root.innerHTML = box.content || '<p>Start writing...</p>';
+        document.getElementById('textModal').classList.add('active');
+    }
+
+    function saveTextEdit() {
+        if (currentEditingBoxId !== null && modalQuill) {
+            const box = boxes.find(b => b.id === currentEditingBoxId);
+            if (box) {
+                box.content = modalQuill.root.innerHTML;
+                renderAdminCanvas();
+                selectedBoxId = currentEditingBoxId;
+            }
+        }
+        document.getElementById('textModal').classList.remove('active');
+        currentEditingBoxId = null;
+    }
+
+    // Resize Handles
+    function setupResizeHandles() {
+        ['handle-right', 'handle-bottom', 'handle-corner'].forEach(handleClass => {
+            document.querySelectorAll(`.${handleClass}`).forEach(handle => {
+                const boxId = parseInt(handle.dataset.id);
+                const box = boxes.find(b => b.id === boxId);
+                if (!box) return;
+                let isResizing = false;
+                let startX, startY, startWidth, startHeight;
+                const boxEl = handle.closest('.free-box');
+                handle.addEventListener('mousedown', (e) => {
+                    e.stopPropagation();
+                    isResizing = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    startWidth = box.width;
+                    startHeight = box.height;
+                    document.body.style.cursor = handleClass === 'handle-right' ? 'ew-resize' : (handleClass === 'handle-bottom' ? 'ns-resize' : 'nw-resize');
+                    e.preventDefault();
+                });
+                const onMouseMove = (e) => {
+                    if (!isResizing) return;
+                    if (handleClass === 'handle-right') {
+                        box.width = Math.max(120, Math.min(1000, startWidth + (e.clientX - startX)));
+                        if (boxEl) boxEl.style.width = box.width + 'px';
+                    } else if (handleClass === 'handle-bottom') {
+                        box.height = Math.max(100, Math.min(800, startHeight + (e.clientY - startY)));
+                        if (boxEl) boxEl.style.height = box.height + 'px';
+                    } else {
+                        box.width = Math.max(120, Math.min(1000, startWidth + (e.clientX - startX)));
+                        box.height = Math.max(100, Math.min(800, startHeight + (e.clientY - startY)));
+                        if (boxEl) {
+                            boxEl.style.width = box.width + 'px';
+                            boxEl.style.height = box.height + 'px';
+                        }
+                    }
+                    const badge = boxEl?.querySelector('.size-badge');
+                    if (badge) badge.textContent = `${box.width} × ${box.height}`;
+                };
+                const onMouseUp = () => {
+                    isResizing = false;
+                    document.body.style.cursor = '';
+                    window.removeEventListener('mousemove', onMouseMove);
+                    window.removeEventListener('mouseup', onMouseUp);
+                };
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('mouseup', onMouseUp);
+            });
+        });
+    }
+
+    // Drag and Drop
+    document.querySelectorAll('.drag-item').forEach(item => {
+        item.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', JSON.stringify({ type: item.dataset.type }));
+            e.dataTransfer.effectAllowed = 'copy';
+        });
+    });
+
+    const gridContainerEl = document.getElementById('freeGrid');
+    if (gridContainerEl) {
+        gridContainerEl.addEventListener('dragover', (e) => e.preventDefault());
+        gridContainerEl.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const rawData = e.dataTransfer.getData('text/plain');
+            if (!rawData) return;
+            try {
+                const { type } = JSON.parse(rawData);
+                let newBox = null;
+                if (type === 'text') {
+                    newBox = { id: nextId++, type: 'text', width: 300, height: 250, content: '<h2 style="color:#f0c040;">New Text Block</h2><p>Click ✎ to edit!</p>' };
+                } else if (type === 'image') {
+                    newBox = { id: nextId++, type: 'image', width: 260, height: 240, content: 'https://picsum.photos/400/300' };
+                } else if (type === 'video') {
+                    newBox = { id: nextId++, type: 'video', width: 280, height: 240, content: 'https://media.giphy.com/media/3o7abB06u9bNzA8LC8/giphy.gif' };
+                } else if (type === 'ranked') {
+                    const defaultData = getDefaultRankedData();
+                    defaultData.items = generateRankedItems(10, []);
+                    newBox = { id: nextId++, type: 'ranked', width: 400, height: 500, rankedData: defaultData };
+                }
+                if (newBox) {
+                    boxes.push(newBox);
+                    renderAdminCanvas();
+                    selectedBoxId = newBox.id;
+                }
+            } catch(e) {}
+        });
+    }
+
+    // Folder image drop
+    const folderDropZoneEl = document.getElementById('folderDropZone');
+    if (folderDropZoneEl) {
+        folderDropZoneEl.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            folderDropZoneEl.classList.add('drag-over');
+        });
+        folderDropZoneEl.addEventListener('dragleave', () => {
+            folderDropZoneEl.classList.remove('drag-over');
+        });
+        folderDropZoneEl.addEventListener('drop', (e) => {
+            e.preventDefault();
+            folderDropZoneEl.classList.remove('drag-over');
+            const files = Array.from(e.dataTransfer.files);
+            const imageFiles = files.filter(f => f.type.startsWith('image/'));
+            imageFiles.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const newBox = { id: nextId++, type: 'image', width: 260, height: 240, content: event.target.result };
+                    boxes.push(newBox);
+                    renderAdminCanvas();
+                    selectedBoxId = newBox.id;
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    }
+
+    function initDragSort() {
+        if (sortableInstance) sortableInstance.destroy();
+        sortableInstance = new Sortable(gridContainerEl, {
+            animation: 200,
+            handle: '.free-box',
+            ghostClass: 'sortable-drag',
+            onEnd: () => {
+                const newOrder = [];
+                document.querySelectorAll('.free-box').forEach(el => {
+                    const found = boxes.find(b => b.id === parseInt(el.dataset.id));
+                    if (found) newOrder.push(found);
+                });
+                if (newOrder.length === boxes.length) boxes = newOrder;
+            }
+        });
+    }
+
+    // Save/Load
+    function saveDraft() {
+        localStorage.setItem('blogBuilder_draft', JSON.stringify({ boxes, nextId }));
+        alert('✅ Draft saved!');
+    }
+
+    function publishStory() {
+        localStorage.setItem('blogBuilder_published', JSON.stringify({ boxes, nextId }));
+        alert('⭐ Published! Visitors will now see this story.');
+        renderVisitorView();
+    }
+
+    function loadPublished() {
+        const saved = localStorage.getItem('blogBuilder_published');
+        if (saved) {
+            const data = JSON.parse(saved);
+            boxes = data.boxes || [];
+            nextId = data.nextId || 10;
+        } else {
+            // Demo content
+            const defaultRanked = getDefaultRankedData();
+            defaultRanked.items = generateRankedItems(5, []);
+            defaultRanked.openingStatement = 'Check out the hottest deals this week!';
+            boxes = [
+                { id: nextId++, type: 'text', width: 350, height: 200, content: '<h1 style="color:#f0c040;">🔥 Featured Story</h1><p>Welcome to DealStreets blog!</p>' },
+                { id: nextId++, type: 'ranked', width: 450, height: 550, rankedData: defaultRanked }
+            ];
+        }
+        renderVisitorView();
+    }
+
+    function loadDraftForAdmin() {
+        const saved = localStorage.getItem('blogBuilder_draft');
+        if (saved) {
+            const data = JSON.parse(saved);
+            boxes = data.boxes || [];
+            nextId = data.nextId || 10;
+        } else {
+            const defaultRanked = getDefaultRankedData();
+            defaultRanked.items = generateRankedItems(5, []);
+            boxes = [
+                { id: nextId++, type: 'text', width: 350, height: 200, content: '<h1 style="color:#f0c040;">🔥 Featured Story</h1><p>Drag blocks to build your story!</p>' },
+                { id: nextId++, type: 'ranked', width: 450, height: 550, rankedData: defaultRanked }
+            ];
+        }
+        renderAdminCanvas();
+    }
+
+    // Admin Login
+    function checkAdminLogin() {
+        const pwd = document.getElementById('adminPasswordInput').value;
+        if (pwd === MASTER_CODE) {
+            adminLoggedIn = true;
+            document.getElementById('loginOverlay').classList.add('hide');
+            document.getElementById('adminView').style.display = 'flex';
+            document.getElementById('visitorView').classList.remove('show');
+            loadDraftForAdmin();
+        } else {
+            alert('Invalid code');
+        }
+    }
+
+    function showAdminLoginFromVisitor() {
+        document.getElementById('loginOverlay').classList.remove('hide');
+    }
+
+    function adminLogout() {
+        adminLoggedIn = false;
+        document.getElementById('adminView').style.display = 'none';
+        document.getElementById('visitorView').classList.add('show');
+        document.getElementById('loginOverlay').classList.remove('hide');
+        loadPublished();
+    }
+
+    // UI Buttons
+    document.getElementById('toggleRulerBtn')?.addEventListener('click', () => {
+        rulerVisible = !rulerVisible;
+        document.getElementById('freeGrid').classList.toggle('show-ruler', rulerVisible);
+        document.getElementById('toggleRulerBtn').innerHTML = rulerVisible ? '📏 Hide Grid' : '📏 Show Grid';
+    });
     
-    // Expose globals
-    window.openAdminPanel = openAdminPanel;
-    window.closeAdminPanel = closeAdminPanel;
-    window.doAdminLogin = doAdminLogin;
-    window.showArticleEditor = showArticleEditor;
-    window.saveArticle = saveArticle;
-    window.saveAndPublish = saveAndPublish;
-    window.deleteArticle = deleteArticle;
-    window.editArticle = editArticle;
-    window.closeArticleEditor = closeArticleEditor;
-    window.copyToClipboard = copyToClipboard;
-    window.deleteImage = deleteImage;
-    window.setPublished = setPublished;
-    window.showArchive = showArchive;
-    window.showFeatured = showFeatured;
-    window.viewArchivedStory = viewArchivedStory;
+    document.getElementById('previewModeBtn')?.addEventListener('click', () => {
+        previewMode = !previewMode;
+        document.getElementById('previewModeBtn').innerText = previewMode ? '👁️ Preview ON' : '👁️ Preview OFF';
+        if (previewMode) document.querySelector('.canvas-area').classList.add('preview-mode');
+        else document.querySelector('.canvas-area').classList.remove('preview-mode');
+    });
     
-    createNightSky();
-    loadData();
+    document.getElementById('saveDraftBtn')?.addEventListener('click', saveDraft);
+    document.getElementById('publishBtn')?.addEventListener('click', publishStory);
+    document.getElementById('resetCanvasBtn')?.addEventListener('click', () => {
+        if (confirm('Reset all blocks?')) {
+            boxes = [];
+            nextId = 1;
+            selectedBoxId = null;
+            renderAdminCanvas();
+        }
+    });
+
+    // Modal events
+    document.getElementById('closeRankedModal')?.addEventListener('click', () => {
+        document.getElementById('rankedModal').classList.remove('active');
+        currentEditingBoxId = null;
+    });
+    document.getElementById('cancelRankedEdit')?.addEventListener('click', () => {
+        document.getElementById('rankedModal').classList.remove('active');
+        currentEditingBoxId = null;
+    });
+    document.getElementById('saveRankedList')?.addEventListener('click', saveRankedList);
+    document.getElementById('closeTextModal')?.addEventListener('click', () => {
+        document.getElementById('textModal').classList.remove('active');
+        currentEditingBoxId = null;
+    });
+    document.getElementById('cancelTextEdit')?.addEventListener('click', () => {
+        document.getElementById('textModal').classList.remove('active');
+        currentEditingBoxId = null;
+    });
+    document.getElementById('saveTextEdit')?.addEventListener('click', saveTextEdit);
+
+    // Initialize
+    loadPublished();
+    document.getElementById('visitorView').classList.add('show');
 </script>
 </body>
 </html>
