@@ -4,908 +4,437 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DealStreets — Featured Story Builder</title>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <style>
-        * { box-sizing: border-box; }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: 'Rajdhani', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #0a0a14;
-            margin: 0;
-            padding: 20px;
-            height: 100vh;
-            overflow: hidden;
             color: #e8e8f0;
+            min-height: 100vh;
         }
-
-        /* Night Sky Background */
-        .night-sky {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
-            background: radial-gradient(ellipse at center, #0a0a2a 0%, #020210 100%);
-        }
-
-        .app {
-            display: flex;
-            gap: 24px;
-            height: 100%;
-            max-width: 1600px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Visitor View */
         .visitor-view {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: #0a0a14;
-            z-index: 200;
-            overflow-y: auto;
-            padding: 20px;
-            display: none;
-        }
-
-        .visitor-view.show {
-            display: block;
-        }
-
-        .visitor-header {
-            background: linear-gradient(90deg, rgba(10,10,20,0.95), rgba(19,21,30,0.95));
-            border-bottom: 1px solid #2a2d38;
-            padding: 0 1.5rem;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .visitor-logo {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 2rem;
-            color: #f0c040;
-        }
-
-        .visitor-logo span { color: #e63946; }
-
-        .visitor-content {
             max-width: 1000px;
             margin: 0 auto;
             padding: 2rem;
         }
-
-        .visitor-block {
+        .visitor-header {
             background: #16181f;
-            border-radius: 16px;
-            border: 1px solid #2a2d38;
-            margin-bottom: 2rem;
-            overflow: hidden;
-        }
-
-        /* Admin Toolbox */
-        .toolbox {
-            width: 320px;
-            background: #16181f;
-            border-radius: 24px;
-            border: 1px solid #2a2d38;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            overflow-y: auto;
-            flex-shrink: 0;
-        }
-
-        .toolbox h2 {
-            font-size: 1.3rem;
-            margin: 0 0 8px 0;
-            color: #f0c040;
-            font-family: 'Bebas Neue', sans-serif;
-        }
-
-        .drag-item {
-            background: linear-gradient(135deg, #1a1c26, #2a2d38);
-            border: 1px solid #f0c040;
-            color: #f0c040;
-            padding: 18px;
-            border-radius: 20px;
-            cursor: grab;
-            text-align: center;
-            font-weight: 600;
-            transition: transform 0.1s;
-        }
-
-        .drag-item:active { cursor: grabbing; }
-        .drag-item:hover { transform: scale(1.02); border-color: #f0c040; background: #2a2d38; }
-        .drag-item.text { border-color: #3b82f6; }
-        .drag-item.image { border-color: #10b981; }
-        .drag-item.video { border-color: #f59e0b; }
-        .drag-item.ranked { border-color: #e63946; }
-
-        .drag-icon { font-size: 2rem; display: block; margin-bottom: 8px; }
-
-        .folder-drop-zone {
-            background: #0a0a14;
-            border: 2px dashed #2a2d38;
-            border-radius: 16px;
-            padding: 16px;
-            text-align: center;
-            margin-top: 10px;
-        }
-
-        .folder-drop-zone.drag-over {
-            border-color: #10b981;
-            background: rgba(16,185,129,0.1);
-        }
-
-        .canvas-area {
-            flex: 1;
-            background: #0d0d14;
-            border-radius: 24px;
-            border: 1px solid #2a2d38;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-
-        .canvas-header {
-            padding: 16px 24px;
-            background: #16181f;
-            border-bottom: 1px solid #2a2d38;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .canvas-header h3 {
-            font-family: 'Bebas Neue', sans-serif;
-            color: #f0c040;
-            margin: 0;
-        }
-
-        .canvas-controls { display: flex; gap: 12px; flex-wrap: wrap; }
-
-        button {
-            padding: 8px 16px;
-            border-radius: 40px;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-            transition: 0.2s;
-            font-family: 'Rajdhani', sans-serif;
-        }
-
-        .btn-preview { background: #f59e0b; color: white; }
-        .btn-save { background: #10b981; color: white; }
-        .btn-reset { background: #e63946; color: white; }
-        .btn-ruler { background: #3b82f6; color: white; }
-        .btn-publish { background: #f0c040; color: #000; font-weight: bold; }
-        .btn-logout { background: #6c757d; color: white; }
-
-        .grid-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 24px;
-            background: #0a0a10;
-        }
-
-        .free-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            align-items: flex-start;
-            min-height: 500px;
-        }
-
-        .free-grid.show-ruler {
-            background-image: repeating-linear-gradient(to right, rgba(240,192,64,0.08) 0px, rgba(240,192,64,0.08) 1px, transparent 1px, transparent 40px);
-            background-size: 40px 40px;
-        }
-
-        .free-box {
-            background: #16181f;
-            border-radius: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            overflow: hidden;
-            position: relative;
-            border: 2px solid #2a2d38;
-            transition: border 0.1s;
-        }
-
-        .free-box.selected {
-            border: 2px solid #f0c040;
-            box-shadow: 0 0 0 3px rgba(240,192,64,0.2);
-        }
-
-        .resize-handle {
-            position: absolute;
-            background: #f0c040;
-            border-radius: 50%;
-            width: 12px;
-            height: 12px;
-            z-index: 20;
-            opacity: 0;
-            transition: 0.1s;
-            pointer-events: none;
-        }
-
-        .free-box.selected .resize-handle {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .handle-right { right: -6px; top: 50%; transform: translateY(-50%); cursor: ew-resize; }
-        .handle-bottom { bottom: -6px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
-        .handle-corner { bottom: -6px; right: -6px; cursor: nw-resize; }
-
-        .box-content {
-            width: 100%;
-            height: 100%;
-            padding: 16px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .box-content img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            border-radius: 12px;
-        }
-
-        .delete-box {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            background: rgba(230,57,70,0.9);
-            color: white;
-            border: none;
-            border-radius: 30px;
-            width: 28px;
-            height: 28px;
-            cursor: pointer;
-            font-weight: bold;
-            z-index: 90;
-            opacity: 0;
-            transition: 0.1s;
-        }
-
-        .edit-icon {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            background: rgba(0,0,0,0.8);
-            color: #f0c040;
-            border: 1px solid #f0c040;
-            border-radius: 30px;
-            width: 28px;
-            height: 28px;
-            cursor: pointer;
-            font-size: 14px;
-            opacity: 0;
-            transition: 0.1s;
-            z-index: 90;
-        }
-
-        .free-box:hover .delete-box,
-        .free-box:hover .edit-icon {
-            opacity: 1;
-        }
-
-        .size-badge {
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            background: rgba(0,0,0,0.7);
-            color: #888;
-            font-size: 10px;
-            padding: 2px 8px;
-            border-radius: 20px;
-            font-family: monospace;
-            pointer-events: none;
-            z-index: 90;
-            opacity: 0;
-        }
-
-        .free-box:hover .size-badge { opacity: 1; }
-
-        /* Ranked List Styles */
-        .ranked-banner {
-            width: 100%;
-            border-radius: 12px;
-            margin-bottom: 1rem;
-        }
-
-        .ranked-opening {
-            background: rgba(240,192,64,0.1);
-            border-left: 4px solid #f0c040;
-            padding: 0.8rem;
-            margin: 0.5rem 0 1rem 0;
-            font-size: 0.9rem;
-            border-radius: 0 8px 8px 0;
-        }
-
-        .rank-item {
-            margin-bottom: 1.5rem;
-            background: rgba(0,0,0,0.3);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .rank-number {
-            background: linear-gradient(135deg, #f0c040, #e63946);
-            display: inline-block;
-            padding: 0.2rem 0.8rem;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.2rem;
-            color: #000;
-            border-radius: 0 0 8px 0;
-        }
-
-        .rank-content {
-            padding: 0.8rem;
-        }
-
-        .rank-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #f0c040;
-        }
-
-        .rank-deal {
-            background: #e63946;
-            display: inline-block;
-            padding: 0.1rem 0.6rem;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            margin: 0.3rem 0;
-        }
-
-        .rank-image {
-            max-width: 100%;
-            border-radius: 8px;
-            margin: 0.5rem 0;
-        }
-
-        .rank-conclusion {
-            background: linear-gradient(135deg, rgba(240,192,64,0.1), rgba(0,0,0,0.3));
-            border: 1px solid #f0c040;
-            border-radius: 12px;
-            padding: 0.8rem;
-            margin-top: 1rem;
-        }
-
-        /* Modals */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal.active { display: flex; }
-
-        .modal-content {
-            background: #16181f;
-            border: 1px solid #2a2d38;
-            border-radius: 24px;
-            width: 900px;
-            max-width: 90vw;
-            max-height: 85vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .modal-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid #2a2d38;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-header h3 { color: #f0c040; margin: 0; font-family: 'Bebas Neue', sans-serif; }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #888;
-        }
-
-        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
-
-        .modal-footer {
-            padding: 16px 20px;
-            border-top: 1px solid #2a2d38;
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-
-        .btn-primary { background: #f0c040; color: #000; }
-        .btn-secondary { background: #2a2d38; color: white; }
-
-        .rank-editor-item {
-            background: #0a0a14;
-            border-radius: 12px;
             padding: 1rem;
-            margin-bottom: 1rem;
-            border: 1px solid #2a2d38;
+            text-align: center;
+            border-bottom: 2px solid #f0c040;
+            margin-bottom: 2rem;
         }
-
-        .rank-editor-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #2a2d38;
+        .admin-bar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
         }
-
-        .rank-number-badge {
+        .admin-btn, .login-btn {
             background: #f0c040;
             color: #000;
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
             font-weight: bold;
+            margin-left: 10px;
         }
-
-        .rank-editor-item input, .rank-editor-item textarea {
-            width: 100%;
-            margin-bottom: 0.5rem;
-            padding: 0.5rem;
-            background: #1a1c26;
-            border: 1px solid #2a2d38;
-            color: white;
-            border-radius: 6px;
-            font-family: inherit;
-        }
-
-        #modalRichEditor { height: 400px; }
-        .ql-toolbar.ql-snow { background: #1a1c26; border-color: #2a2d38; }
-        .ql-container.ql-snow { background: #0a0a14; border-color: #2a2d38; color: white; }
-        .ql-editor { color: white; }
-
         .login-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.98);
+            background: rgba(0,0,0,0.95);
             z-index: 2000;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-
         .login-overlay.hide { display: none; }
-
         .login-box {
             background: #16181f;
-            border: 1px solid #2a2d38;
-            border-radius: 24px;
             padding: 2rem;
-            width: 320px;
+            border-radius: 16px;
             text-align: center;
         }
-
         .login-box input {
+            padding: 10px;
+            margin: 10px 0;
             width: 100%;
-            padding: 0.6rem;
-            margin: 1rem 0;
+        }
+        .editor-view {
+            display: none;
+            padding: 20px;
+        }
+        .toolbox {
+            position: fixed;
+            left: 20px;
+            top: 100px;
+            width: 200px;
+            background: #16181f;
+            padding: 15px;
+            border-radius: 12px;
+        }
+        .drag-item {
+            background: #2a2d38;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            cursor: grab;
+            text-align: center;
+        }
+        .canvas {
+            margin-left: 240px;
+            min-height: 500px;
+            padding: 20px;
+            background: #0d0d14;
+            border-radius: 12px;
+        }
+        .block {
+            background: #16181f;
+            border: 2px solid #2a2d38;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .block.selected { border-color: #f0c040; }
+        .block-controls {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: flex;
+            gap: 5px;
+        }
+        .block-controls button {
+            background: #e63946;
+            border: none;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .edit-block {
+            background: #f0c040 !important;
+            color: #000 !important;
+        }
+        .block-content { padding: 15px; }
+        .rank-item {
+            background: #0a0a14;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        button {
+            background: #f0c040;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 3000;
+            padding: 50px;
+            overflow-y: auto;
+        }
+        .modal.active { display: block; }
+        .modal-content {
+            background: #16181f;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 16px;
+        }
+        .rank-editor-item {
+            background: #0a0a14;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .rank-editor-item input, .rank-editor-item textarea {
+            width: 100%;
+            margin: 5px 0;
+            padding: 8px;
             background: #1a1c26;
             border: 1px solid #2a2d38;
             color: white;
-            border-radius: 8px;
+            border-radius: 6px;
         }
+        #quill-editor { height: 300px; background: white; color: black; margin-bottom: 20px; }
     </style>
 </head>
 <body>
-<div class="night-sky"></div>
+
+<!-- Visitor View -->
+<div id="visitorView">
+    <div class="visitor-header">
+        <h1 style="color:#f0c040;">DealStreets // Featured Story</h1>
+        <button class="login-btn" onclick="showLogin()">🔐 Admin</button>
+        <a href="https://dealstreets.xyz"><button>← Back to Promos</button></a>
+    </div>
+    <div id="visitorContent" class="visitor-view"></div>
+</div>
 
 <!-- Login Overlay -->
 <div id="loginOverlay" class="login-overlay">
     <div class="login-box">
-        <h2 style="color:#f0c040;">🔐 Admin Login</h2>
-        <input type="password" id="adminPasswordInput" placeholder="Enter master code">
-        <button class="btn-primary" onclick="checkAdminLogin()">Login</button>
+        <h2>Admin Login</h2>
+        <input type="password" id="adminPassword" placeholder="Enter master code">
+        <button onclick="checkLogin()">Login</button>
     </div>
 </div>
 
-<!-- Visitor View (what everyone sees) -->
-<div id="visitorView" class="visitor-view">
-    <div class="visitor-header">
-        <div class="visitor-logo">Deal<span>Streets</span> // Featured Story</div>
-        <div>
-            <button class="btn-publish" onclick="showAdminLoginFromVisitor()">🔐 Admin</button>
-            <a href="https://dealstreets.xyz" style="text-decoration:none; margin-left:0.5rem;"><button class="btn-secondary">← Back to Promos</button></a>
-        </div>
-    </div>
-    <div id="visitorContent" class="visitor-content"></div>
-</div>
-
-<!-- Admin Builder View -->
-<div id="adminView" class="app" style="display:none;">
+<!-- Editor View -->
+<div id="editorView" class="editor-view">
     <div class="toolbox">
-        <h2>📦 Block Builder</h2>
-        
-        <div class="drag-item text" draggable="true" data-type="text">
-            <span class="drag-icon">📝</span> Text Block
-        </div>
-        <div class="drag-item image" draggable="true" data-type="image">
-            <span class="drag-icon">🖼️</span> Image Block
-        </div>
-        <div class="drag-item video" draggable="true" data-type="video">
-            <span class="drag-icon">🎬</span> Video Block
-        </div>
-        <div class="drag-item ranked" draggable="true" data-type="ranked">
-            <span class="drag-icon">🏆</span> Ranked List Block
-        </div>
-
-        <div class="folder-drop-zone" id="folderDropZone">
-            📁 <strong>DRAG IMAGES FROM FOLDER</strong><br>
-            <small>Open folder → select images → drag here</small>
-        </div>
-
-        <div class="info-text">
-            ⚡ <strong>Ranked List:</strong> Drop onto canvas → click ✎ to edit
-        </div>
-        <button class="btn-logout" onclick="adminLogout()" style="margin-top:10px;">🚪 Logout</button>
+        <h3>Blocks</h3>
+        <div class="drag-item" draggable="true" data-type="text">📝 Text Block</div>
+        <div class="drag-item" draggable="true" data-type="image">🖼️ Image Block</div>
+        <div class="drag-item" draggable="true" data-type="ranked">🏆 Ranked List</div>
+        <button onclick="saveDraft()">💾 Save Draft</button>
+        <button onclick="publishStory()">⭐ Publish</button>
+        <button onclick="logout()">🚪 Logout</button>
     </div>
-
-    <div class="canvas-area">
-        <div class="canvas-header">
-            <h3>📄 Your Blog Canvas</h3>
-            <div class="canvas-controls">
-                <button id="toggleRulerBtn" class="btn-ruler">📏 Show Grid</button>
-                <button id="previewModeBtn" class="btn-preview">👁️ Preview OFF</button>
-                <button id="saveDraftBtn" class="btn-save">💾 Save Draft</button>
-                <button id="publishBtn" class="btn-publish">⭐ Publish</button>
-                <button id="resetCanvasBtn" class="btn-reset">🔄 Reset</button>
-            </div>
-        </div>
-        <div class="grid-container">
-            <div id="freeGrid" class="free-grid"></div>
-        </div>
-    </div>
+    <div class="canvas" id="canvas" droppable="true"></div>
 </div>
 
 <!-- Ranked Editor Modal -->
 <div id="rankedModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <h3>🏆 Edit Ranked List</h3>
-            <button class="modal-close" id="closeRankedModal">&times;</button>
-        </div>
-        <div class="modal-body" id="rankedModalBody"></div>
-        <div class="modal-footer">
-            <button class="btn-secondary" id="cancelRankedEdit">Cancel</button>
-            <button class="btn-primary" id="saveRankedList">Save</button>
-        </div>
+        <h3>Edit Ranked List</h3>
+        <div id="rankedEditorContent"></div>
+        <button onclick="saveRankedEdit()">Save</button>
+        <button onclick="closeRankedModal()">Cancel</button>
     </div>
 </div>
 
 <!-- Text Editor Modal -->
 <div id="textModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            <h3>✏️ Edit Text</h3>
-            <button class="modal-close" id="closeTextModal">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div id="modalRichEditor"></div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-secondary" id="cancelTextEdit">Cancel</button>
-            <button class="btn-primary" id="saveTextEdit">Save</button>
-        </div>
+        <h3>Edit Text</h3>
+        <div id="quill-editor"></div>
+        <button onclick="saveTextEdit()">Save</button>
+        <button onclick="closeTextModal()">Cancel</button>
     </div>
 </div>
 
 <script>
-    const MASTER_CODE = 'Metapi$ix!';
-    let adminLoggedIn = false;
+    const MASTER_CODE = 'DealStreetsMaster2025!';
     let boxes = [];
     let nextId = 1;
-    let previewMode = false;
-    let rulerVisible = false;
-    let selectedBoxId = null;
-    let currentEditingBoxId = null;
-    let currentEditingRankedData = null;
-    let modalQuill = null;
-    let sortableInstance = null;
+    let selectedBlockId = null;
+    let currentEditId = null;
+    let currentRankedData = null;
+    let quill = null;
+    let sortable = null;
 
-    // Helper functions
+    // Helper
     function escapeHtml(str) {
         if (!str) return '';
         return String(str).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
     }
 
-    // Default ranked data
-    function getDefaultRankedData() {
-        return {
-            rankCount: 10,
-            bannerImage: '',
-            openingStatement: 'Here are the top deals you need to know about...',
-            items: [],
-            conclusion: 'Don\'t miss out on these amazing offers!'
-        };
-    }
-
-    function generateRankedItems(rankCount, existingItems = []) {
-        const items = [];
-        for (let i = rankCount; i >= 1; i--) {
-            const existing = existingItems.find(item => item.rank === i);
-            items.push({
-                rank: i,
-                title: existing?.title || `Item #${i}`,
-                deal: existing?.deal || '',
-                image: existing?.image || '',
-                description: existing?.description || `Description for #${i}`
-            });
-        }
-        return items;
-    }
-
-    function renderRankedBlock(data) {
-        if (!data.items || data.items.length === 0) {
-            data.items = generateRankedItems(data.rankCount || 10, []);
-        }
-        
-        let itemsHtml = data.items.map(item => `
-            <div class="rank-item">
-                <div class="rank-number">#${item.rank}</div>
-                <div class="rank-content">
-                    <div class="rank-title">${escapeHtml(item.title)}</div>
-                    ${item.deal ? `<div class="rank-deal">🔥 ${escapeHtml(item.deal)}</div>` : ''}
-                    ${item.image ? `<img class="rank-image" src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}">` : ''}
-                    <div class="rank-description">${escapeHtml(item.description)}</div>
-                </div>
-            </div>
-        `).join('');
-        
-        return `
-            ${data.bannerImage ? `<img class="ranked-banner" src="${escapeHtml(data.bannerImage)}" alt="Banner">` : ''}
-            ${data.openingStatement ? `<div class="ranked-opening">${escapeHtml(data.openingStatement)}</div>` : ''}
-            <h3 style="color:#f0c040; margin:0.5rem 0;">The List</h3>
-            ${itemsHtml}
-            ${data.conclusion ? `<div class="rank-conclusion">${escapeHtml(data.conclusion)}</div>` : ''}
-        `;
-    }
-
-    function renderBoxForAdmin(box) {
-        let contentHtml = '';
-        if (box.type === 'text') {
-            contentHtml = `<div class="box-content">${box.content || '<p><em>Click ✎ to edit</em></p>'}</div>`;
-        } else if (box.type === 'image') {
-            contentHtml = `<div class="box-content"><img src="${box.content}" alt="image" draggable="false"></div>`;
-        } else if (box.type === 'video') {
-            contentHtml = `<div class="box-content">${getVideoHtml(box.content)}</div>`;
-        } else if (box.type === 'ranked') {
-            contentHtml = `<div class="box-content">${renderRankedBlock(box.rankedData || getDefaultRankedData())}</div>`;
-        }
-        
-        const selectedClass = (selectedBoxId === box.id) ? 'selected' : '';
-        return `
-            <div class="free-box ${selectedClass}" data-id="${box.id}" data-type="${box.type}" style="width: ${box.width}px; height: ${box.height}px;">
-                <button class="delete-box" data-id="${box.id}">✕</button>
-                <button class="edit-icon" data-id="${box.id}" data-type="${box.type}">✎</button>
-                <div class="resize-handle handle-right" data-id="${box.id}"></div>
-                <div class="resize-handle handle-bottom" data-id="${box.id}"></div>
-                <div class="resize-handle handle-corner" data-id="${box.id}"></div>
-                <div class="size-badge">${box.width} × ${box.height}</div>
-                ${contentHtml}
-            </div>
-        `;
-    }
-
-    function renderBoxForVisitor(box) {
-        let contentHtml = '';
-        if (box.type === 'text') {
-            contentHtml = `<div class="box-content">${box.content || ''}</div>`;
-        } else if (box.type === 'image') {
-            contentHtml = `<div class="box-content"><img src="${box.content}" alt="image"></div>`;
-        } else if (box.type === 'video') {
-            contentHtml = `<div class="box-content">${getVideoHtml(box.content)}</div>`;
-        } else if (box.type === 'ranked') {
-            contentHtml = `<div class="box-content">${renderRankedBlock(box.rankedData || getDefaultRankedData())}</div>`;
-        }
-        
-        return `
-            <div class="visitor-block" style="width:100%;">
-                ${contentHtml}
-            </div>
-        `;
-    }
-
-    function getVideoHtml(url) {
-        if (!url) return '<p>🎬 Add video URL</p>';
-        const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^"&?\/\s]{11})/);
-        if (ytMatch) return `<iframe src="https://www.youtube.com/embed/${ytMatch[1]}" frameborder="0" allowfullscreen style="width:100%; height:300px; border-radius:12px;"></iframe>`;
-        if (url.match(/\.(mp4|webm|gif)$/i)) {
-            return `<video controls autoplay loop muted style="width:100%; border-radius:12px;"><source src="${url}"></video>`;
-        }
-        return `<img src="${url}" style="width:100%; border-radius:12px;">`;
-    }
-
-    function renderVisitorView() {
+    // Render visitor view
+    function renderVisitor() {
         const container = document.getElementById('visitorContent');
-        if (!boxes.length) {
-            container.innerHTML = '<div style="text-align:center; padding:3rem;">No featured story yet. Check back soon!</div>';
-            return;
+        const saved = localStorage.getItem('blogBuilder_published');
+        let publishedBoxes = [];
+        if (saved) {
+            const data = JSON.parse(saved);
+            publishedBoxes = data.boxes || [];
         }
-        container.innerHTML = boxes.map(box => renderBoxForVisitor(box)).join('');
-    }
-
-    function renderAdminCanvas() {
-        if (boxes.length === 0) {
-            document.getElementById('freeGrid').innerHTML = '<div class="empty-canvas">✨ Drag blocks from the left to build your featured story!</div>';
-            return;
-        }
-        document.getElementById('freeGrid').innerHTML = '';
-        boxes.forEach(box => {
-            document.getElementById('freeGrid').insertAdjacentHTML('beforeend', renderBoxForAdmin(box));
-        });
-        attachAdminEvents();
-        setupResizeHandles();
-        if (previewMode) document.querySelector('.canvas-area').classList.add('preview-mode');
-        else document.querySelector('.canvas-area').classList.remove('preview-mode');
-        initDragSort();
-    }
-
-    function attachAdminEvents() {
-        document.querySelectorAll('.delete-box').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                boxes = boxes.filter(b => b.id !== parseInt(btn.dataset.id));
-                if (selectedBoxId === parseInt(btn.dataset.id)) selectedBoxId = null;
-                renderAdminCanvas();
-            });
-        });
         
-        document.querySelectorAll('.edit-icon').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = parseInt(btn.dataset.id);
-                const box = boxes.find(b => b.id === id);
-                if (!box) return;
-                
-                if (box.type === 'text') {
-                    openTextEditor(id);
-                } else if (box.type === 'image') {
-                    const newUrl = prompt('🖼️ Enter image URL:', box.content);
-                    if (newUrl !== null) box.content = newUrl;
-                    renderAdminCanvas();
-                    selectedBoxId = id;
-                } else if (box.type === 'video') {
-                    const newUrl = prompt('🎬 Enter video/GIF/YouTube URL:', box.content);
-                    if (newUrl !== null) box.content = newUrl;
-                    renderAdminCanvas();
-                    selectedBoxId = id;
-                } else if (box.type === 'ranked') {
-                    openRankedEditor(id);
+        if (publishedBoxes.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:50px;">No featured story yet. Check back soon!</div>';
+            return;
+        }
+        
+        container.innerHTML = publishedBoxes.map(box => {
+            if (box.type === 'text') {
+                return `<div class="block"><div class="block-content">${box.content || ''}</div></div>`;
+            } else if (box.type === 'image') {
+                return `<div class="block"><div class="block-content"><img src="${box.content}" style="max-width:100%; border-radius:8px;"></div></div>`;
+            } else if (box.type === 'ranked' && box.rankedData) {
+                const data = box.rankedData;
+                let itemsHtml = '';
+                if (data.items) {
+                    itemsHtml = data.items.map(item => `
+                        <div class="rank-item">
+                            <strong style="color:#f0c040;">#${item.rank} ${escapeHtml(item.title)}</strong>
+                            ${item.deal ? `<span style="background:#e63946; padding:2px 8px; border-radius:20px; font-size:12px;">${escapeHtml(item.deal)}</span>` : ''}
+                            ${item.image ? `<div><img src="${escapeHtml(item.image)}" style="max-width:100%; border-radius:8px; margin:10px 0;"></div>` : ''}
+                            <p>${escapeHtml(item.description)}</p>
+                        </div>
+                    `).join('');
                 }
-            });
-        });
+                return `
+                    <div class="block">
+                        <div class="block-content">
+                            ${data.bannerImage ? `<img src="${data.bannerImage}" style="width:100%; border-radius:12px;">` : ''}
+                            ${data.openingStatement ? `<p style="background:rgba(240,192,64,0.1); padding:15px; border-left:4px solid #f0c040;">${escapeHtml(data.openingStatement)}</p>` : ''}
+                            <h3 style="color:#f0c040;">The List</h3>
+                            ${itemsHtml}
+                            ${data.conclusion ? `<div style="background:rgba(240,192,64,0.1); padding:15px; border-radius:12px; margin-top:20px;">${escapeHtml(data.conclusion)}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+            return '';
+        }).join('');
+    }
+
+    // Render editor canvas
+    function renderEditor() {
+        const canvas = document.getElementById('canvas');
+        if (boxes.length === 0) {
+            canvas.innerHTML = '<div style="text-align:center; padding:50px; color:#666;">Drag blocks here from the left toolbox</div>';
+            return;
+        }
         
-        document.querySelectorAll('.free-box').forEach(el => {
-            el.addEventListener('click', (e) => {
-                if (e.target.classList.contains('delete-box') || e.target.classList.contains('edit-icon')) return;
-                selectedBoxId = parseInt(el.dataset.id);
-                renderAdminCanvas();
-            });
+        canvas.innerHTML = boxes.map(box => {
+            let contentHtml = '';
+            if (box.type === 'text') {
+                contentHtml = `<div class="block-content">${box.content || '<p><em>Click edit to add content</em></p>'}</div>`;
+            } else if (box.type === 'image') {
+                contentHtml = `<div class="block-content"><img src="${box.content}" style="max-width:100%;"></div>`;
+            } else if (box.type === 'ranked' && box.rankedData) {
+                const data = box.rankedData;
+                let previewHtml = `<div class="block-content"><strong>🏆 Ranked List (Top ${data.rankCount || 10})</strong><br>${data.openingStatement ? data.openingStatement.substring(0, 100) + '...' : 'Click edit to configure'}</div>`;
+                contentHtml = previewHtml;
+            }
+            
+            return `
+                <div class="block ${selectedBlockId === box.id ? 'selected' : ''}" data-id="${box.id}" data-type="${box.type}" style="width:${box.width || 400}px;">
+                    <div class="block-controls">
+                        <button class="edit-block" onclick="editBlock(${box.id})">✎</button>
+                        <button onclick="deleteBlock(${box.id})">✕</button>
+                    </div>
+                    ${contentHtml}
+                </div>
+            `;
+        }).join('');
+        
+        // Re-attach drag events for sorting
+        if (sortable) sortable.destroy();
+        sortable = new Sortable(canvas, {
+            animation: 200,
+            onEnd: () => {
+                const newOrder = [];
+                document.querySelectorAll('#canvas .block').forEach(el => {
+                    const id = parseInt(el.dataset.id);
+                    const found = boxes.find(b => b.id === id);
+                    if (found) newOrder.push(found);
+                });
+                if (newOrder.length === boxes.length) boxes = newOrder;
+            }
         });
     }
 
-    // Ranked Editor
-    function openRankedEditor(boxId) {
-        const box = boxes.find(b => b.id === boxId);
-        if (!box || box.type !== 'ranked') return;
-        currentEditingBoxId = boxId;
-        const data = box.rankedData || getDefaultRankedData();
-        currentEditingRankedData = JSON.parse(JSON.stringify(data));
-        renderRankedEditorModal();
-        document.getElementById('rankedModal').classList.add('active');
+    // Edit block
+    function editBlock(id) {
+        const box = boxes.find(b => b.id === id);
+        if (!box) return;
+        currentEditId = id;
+        
+        if (box.type === 'text') {
+            if (!quill) {
+                quill = new Quill('#quill-editor', {
+                    theme: 'snow',
+                    modules: { toolbar: [['bold', 'italic', 'underline'], [{ 'color': [] }, { 'background': [] }], [{ 'list': 'ordered'}, { 'list': 'bullet' }]] }
+                });
+            }
+            quill.root.innerHTML = box.content || '';
+            document.getElementById('textModal').classList.add('active');
+        } else if (box.type === 'image') {
+            const newUrl = prompt('Enter image URL:', box.content);
+            if (newUrl !== null) {
+                box.content = newUrl;
+                renderEditor();
+            }
+        } else if (box.type === 'ranked') {
+            currentRankedData = box.rankedData || { rankCount: 5, bannerImage: '', openingStatement: '', items: [], conclusion: '' };
+            if (!currentRankedData.items || currentRankedData.items.length === 0) {
+                currentRankedData.items = [];
+                for (let i = currentRankedData.rankCount; i >= 1; i--) {
+                    currentRankedData.items.push({ rank: i, title: `Item ${i}`, deal: '', image: '', description: '' });
+                }
+            }
+            renderRankedModal();
+            document.getElementById('rankedModal').classList.add('active');
+        }
     }
-
-    function renderRankedEditorModal() {
-        const container = document.getElementById('rankedModalBody');
-        const data = currentEditingRankedData;
+    
+    function renderRankedModal() {
+        const container = document.getElementById('rankedEditorContent');
+        const data = currentRankedData;
         
         let itemsHtml = '';
         for (let i = data.rankCount; i >= 1; i--) {
             const item = data.items.find(it => it.rank === i) || { rank: i, title: '', deal: '', image: '', description: '' };
             itemsHtml += `
                 <div class="rank-editor-item">
-                    <div class="rank-editor-header">
-                        <span class="rank-number-badge">#${i}</span>
-                    </div>
-                    <input type="text" id="rank_title_${i}" placeholder="Item Title" value="${escapeHtml(item.title)}">
-                    <input type="text" id="rank_deal_${i}" placeholder="Deal / Price / Discount" value="${escapeHtml(item.deal)}">
+                    <strong>#${i}</strong>
+                    <input type="text" id="rank_title_${i}" placeholder="Title" value="${escapeHtml(item.title)}">
+                    <input type="text" id="rank_deal_${i}" placeholder="Deal/Price" value="${escapeHtml(item.deal)}">
                     <input type="text" id="rank_image_${i}" placeholder="Image URL" value="${escapeHtml(item.image)}">
-                    <textarea id="rank_desc_${i}" placeholder="Description" rows="2">${escapeHtml(item.description)}</textarea>
+                    <textarea id="rank_desc_${i}" rows="2" placeholder="Description">${escapeHtml(item.description)}</textarea>
                 </div>
             `;
         }
         
         container.innerHTML = `
-            <div style="margin-bottom:1rem;">
-                <label style="color:#888;">Number of Items:</label>
-                <select id="rankCountSelect" style="width:100%; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;" onchange="updateRankCount()">
-                    <option value="3" ${data.rankCount === 3 ? 'selected' : ''}>Top 3</option>
-                    <option value="5" ${data.rankCount === 5 ? 'selected' : ''}>Top 5</option>
-                    <option value="6" ${data.rankCount === 6 ? 'selected' : ''}>Top 6</option>
-                    <option value="8" ${data.rankCount === 8 ? 'selected' : ''}>Top 8</option>
-                    <option value="10" ${data.rankCount === 10 ? 'selected' : ''}>Top 10</option>
-                    <option value="12" ${data.rankCount === 12 ? 'selected' : ''}>Top 12</option>
-                    <option value="15" ${data.rankCount === 15 ? 'selected' : ''}>Top 15</option>
-                    <option value="20" ${data.rankCount === 20 ? 'selected' : ''}>Top 20</option>
-                </select>
-            </div>
-            <div style="margin-bottom:1rem;">
-                <label style="color:#888;">Banner Image URL:</label>
-                <input type="text" id="rankBannerImage" placeholder="Paste image URL" value="${escapeHtml(data.bannerImage)}" style="width:100%; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
-            </div>
-            <div style="margin-bottom:1rem;">
-                <label style="color:#888;">Opening Statement:</label>
-                <textarea id="rankOpening" rows="3" style="width:100%; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">${escapeHtml(data.openingStatement)}</textarea>
-            </div>
-            <div id="rankedEditorItems">${itemsHtml}</div>
-            <div style="margin-bottom:1rem;">
-                <label style="color:#888;">Conclusion:</label>
-                <textarea id="rankConclusion" rows="3" style="width:100%; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">${escapeHtml(data.conclusion)}</textarea>
-            </div>
+            <label>Number of Items:</label>
+            <select id="rankCount" onchange="changeRankCount()">
+                <option value="3" ${data.rankCount === 3 ? 'selected' : ''}>Top 3</option>
+                <option value="5" ${data.rankCount === 5 ? 'selected' : ''}>Top 5</option>
+                <option value="10" ${data.rankCount === 10 ? 'selected' : ''}>Top 10</option>
+            </select>
+            <label>Banner Image URL:</label>
+            <input type="text" id="rankBanner" value="${escapeHtml(data.bannerImage)}" style="width:100%; padding:8px;">
+            <label>Opening Statement:</label>
+            <textarea id="rankOpening" rows="3" style="width:100%;">${escapeHtml(data.openingStatement)}</textarea>
+            ${itemsHtml}
+            <label>Conclusion:</label>
+            <textarea id="rankConclusion" rows="3" style="width:100%;">${escapeHtml(data.conclusion)}</textarea>
         `;
     }
-
-    window.updateRankCount = function() {
-        const newCount = parseInt(document.getElementById('rankCountSelect').value);
-        currentEditingRankedData.rankCount = newCount;
+    
+    function changeRankCount() {
+        const newCount = parseInt(document.getElementById('rankCount').value);
+        currentRankedData.rankCount = newCount;
+        const existingItems = currentRankedData.items || [];
         const newItems = [];
         for (let i = newCount; i >= 1; i--) {
-            const existing = currentEditingRankedData.items.find(it => it.rank === i);
+            const existing = existingItems.find(it => it.rank === i);
             newItems.push({
                 rank: i,
-                title: existing?.title || `Item #${i}`,
+                title: existing?.title || `Item ${i}`,
                 deal: existing?.deal || '',
                 image: existing?.image || '',
                 description: existing?.description || ''
             });
         }
-        currentEditingRankedData.items = newItems;
-        renderRankedEditorModal();
-    };
-
-    function saveRankedList() {
-        if (currentEditingBoxId === null) return;
-        const newRankCount = parseInt(document.getElementById('rankCountSelect').value);
+        currentRankedData.items = newItems;
+        renderRankedModal();
+    }
+    
+    function saveRankedEdit() {
+        const newCount = parseInt(document.getElementById('rankCount').value);
         const newItems = [];
-        for (let i = newRankCount; i >= 1; i--) {
+        for (let i = newCount; i >= 1; i--) {
             newItems.push({
                 rank: i,
                 title: document.getElementById(`rank_title_${i}`)?.value || '',
@@ -914,322 +443,176 @@
                 description: document.getElementById(`rank_desc_${i}`)?.value || ''
             });
         }
-        const updatedData = {
-            rankCount: newRankCount,
-            bannerImage: document.getElementById('rankBannerImage')?.value || '',
+        
+        currentRankedData = {
+            rankCount: newCount,
+            bannerImage: document.getElementById('rankBanner')?.value || '',
             openingStatement: document.getElementById('rankOpening')?.value || '',
             items: newItems,
             conclusion: document.getElementById('rankConclusion')?.value || ''
         };
-        const box = boxes.find(b => b.id === currentEditingBoxId);
+        
+        const box = boxes.find(b => b.id === currentEditId);
         if (box) {
-            box.rankedData = updatedData;
-            renderAdminCanvas();
-            selectedBoxId = currentEditingBoxId;
+            box.rankedData = currentRankedData;
+            renderEditor();
         }
-        document.getElementById('rankedModal').classList.remove('active');
-        currentEditingBoxId = null;
+        closeRankedModal();
     }
-
-    // Text Editor
-    function initModalQuill() {
-        if (modalQuill) return;
-        modalQuill = new Quill('#modalRichEditor', {
-            theme: 'snow',
-            modules: {
-                toolbar: [
-                    [{ 'font': ['Arial', 'Times New Roman', 'Courier New', 'Georgia', 'Verdana', 'Impact'] }],
-                    [{ 'size': ['12px', '14px', '16px', '18px', '24px', '32px', '48px'] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    [{ 'color': [] }, { 'background': [] }],
-                    [{ 'header': [1, 2, 3, false] }],
-                    [{ 'align': [] }],
-                    ['blockquote', 'code-block'],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    ['link', 'image']
-                ]
-            }
-        });
-    }
-
-    function openTextEditor(boxId) {
-        const box = boxes.find(b => b.id === boxId);
-        if (!box || box.type !== 'text') return;
-        currentEditingBoxId = boxId;
-        initModalQuill();
-        modalQuill.root.innerHTML = box.content || '<p>Start writing...</p>';
-        document.getElementById('textModal').classList.add('active');
-    }
-
+    
     function saveTextEdit() {
-        if (currentEditingBoxId !== null && modalQuill) {
-            const box = boxes.find(b => b.id === currentEditingBoxId);
+        if (quill && currentEditId) {
+            const box = boxes.find(b => b.id === currentEditId);
             if (box) {
-                box.content = modalQuill.root.innerHTML;
-                renderAdminCanvas();
-                selectedBoxId = currentEditingBoxId;
+                box.content = quill.root.innerHTML;
+                renderEditor();
             }
         }
-        document.getElementById('textModal').classList.remove('active');
-        currentEditingBoxId = null;
+        closeTextModal();
     }
-
-    // Resize Handles
-    function setupResizeHandles() {
-        ['handle-right', 'handle-bottom', 'handle-corner'].forEach(handleClass => {
-            document.querySelectorAll(`.${handleClass}`).forEach(handle => {
-                const boxId = parseInt(handle.dataset.id);
-                const box = boxes.find(b => b.id === boxId);
-                if (!box) return;
-                let isResizing = false;
-                let startX, startY, startWidth, startHeight;
-                const boxEl = handle.closest('.free-box');
-                handle.addEventListener('mousedown', (e) => {
-                    e.stopPropagation();
-                    isResizing = true;
-                    startX = e.clientX;
-                    startY = e.clientY;
-                    startWidth = box.width;
-                    startHeight = box.height;
-                    document.body.style.cursor = handleClass === 'handle-right' ? 'ew-resize' : (handleClass === 'handle-bottom' ? 'ns-resize' : 'nw-resize');
-                    e.preventDefault();
-                });
-                const onMouseMove = (e) => {
-                    if (!isResizing) return;
-                    if (handleClass === 'handle-right') {
-                        box.width = Math.max(120, Math.min(1000, startWidth + (e.clientX - startX)));
-                        if (boxEl) boxEl.style.width = box.width + 'px';
-                    } else if (handleClass === 'handle-bottom') {
-                        box.height = Math.max(100, Math.min(800, startHeight + (e.clientY - startY)));
-                        if (boxEl) boxEl.style.height = box.height + 'px';
-                    } else {
-                        box.width = Math.max(120, Math.min(1000, startWidth + (e.clientX - startX)));
-                        box.height = Math.max(100, Math.min(800, startHeight + (e.clientY - startY)));
-                        if (boxEl) {
-                            boxEl.style.width = box.width + 'px';
-                            boxEl.style.height = box.height + 'px';
-                        }
-                    }
-                    const badge = boxEl?.querySelector('.size-badge');
-                    if (badge) badge.textContent = `${box.width} × ${box.height}`;
-                };
-                const onMouseUp = () => {
-                    isResizing = false;
-                    document.body.style.cursor = '';
-                    window.removeEventListener('mousemove', onMouseMove);
-                    window.removeEventListener('mouseup', onMouseUp);
-                };
-                window.addEventListener('mousemove', onMouseMove);
-                window.addEventListener('mouseup', onMouseUp);
-            });
-        });
+    
+    function deleteBlock(id) {
+        boxes = boxes.filter(b => b.id !== id);
+        if (selectedBlockId === id) selectedBlockId = null;
+        renderEditor();
     }
-
-    // Drag and Drop
+    
+    // Drag and drop
     document.querySelectorAll('.drag-item').forEach(item => {
         item.addEventListener('dragstart', (e) => {
             e.dataTransfer.setData('text/plain', JSON.stringify({ type: item.dataset.type }));
-            e.dataTransfer.effectAllowed = 'copy';
         });
     });
-
-    const gridContainerEl = document.getElementById('freeGrid');
-    if (gridContainerEl) {
-        gridContainerEl.addEventListener('dragover', (e) => e.preventDefault());
-        gridContainerEl.addEventListener('drop', (e) => {
-            e.preventDefault();
-            const rawData = e.dataTransfer.getData('text/plain');
-            if (!rawData) return;
-            try {
-                const { type } = JSON.parse(rawData);
-                let newBox = null;
-                if (type === 'text') {
-                    newBox = { id: nextId++, type: 'text', width: 300, height: 250, content: '<h2 style="color:#f0c040;">New Text Block</h2><p>Click ✎ to edit!</p>' };
-                } else if (type === 'image') {
-                    newBox = { id: nextId++, type: 'image', width: 260, height: 240, content: 'https://picsum.photos/400/300' };
-                } else if (type === 'video') {
-                    newBox = { id: nextId++, type: 'video', width: 280, height: 240, content: 'https://media.giphy.com/media/3o7abB06u9bNzA8LC8/giphy.gif' };
-                } else if (type === 'ranked') {
-                    const defaultData = getDefaultRankedData();
-                    defaultData.items = generateRankedItems(10, []);
-                    newBox = { id: nextId++, type: 'ranked', width: 400, height: 500, rankedData: defaultData };
+    
+    const canvas = document.getElementById('canvas');
+    canvas.addEventListener('dragover', (e) => e.preventDefault());
+    canvas.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const rawData = e.dataTransfer.getData('text/plain');
+        if (!rawData) return;
+        const { type } = JSON.parse(rawData);
+        
+        let newBox = null;
+        if (type === 'text') {
+            newBox = { id: nextId++, type: 'text', width: 400, content: '<h2>New Text Block</h2><p>Click ✎ to edit</p>' };
+        } else if (type === 'image') {
+            newBox = { id: nextId++, type: 'image', width: 400, content: 'https://picsum.photos/400/250' };
+        } else if (type === 'ranked') {
+            newBox = { 
+                id: nextId++, 
+                type: 'ranked', 
+                width: 450, 
+                rankedData: {
+                    rankCount: 5,
+                    bannerImage: '',
+                    openingStatement: 'Here are my top picks!',
+                    items: [
+                        { rank: 5, title: 'Item 5', deal: '', image: '', description: 'Description for #5' },
+                        { rank: 4, title: 'Item 4', deal: '', image: '', description: 'Description for #4' },
+                        { rank: 3, title: 'Item 3', deal: '', image: '', description: 'Description for #3' },
+                        { rank: 2, title: 'Item 2', deal: '', image: '', description: 'Description for #2' },
+                        { rank: 1, title: 'Item 1', deal: '', image: '', description: 'Description for #1' }
+                    ],
+                    conclusion: 'Thanks for reading!'
                 }
-                if (newBox) {
-                    boxes.push(newBox);
-                    renderAdminCanvas();
-                    selectedBoxId = newBox.id;
-                }
-            } catch(e) {}
-        });
-    }
-
-    // Folder image drop
-    const folderDropZoneEl = document.getElementById('folderDropZone');
-    if (folderDropZoneEl) {
-        folderDropZoneEl.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            folderDropZoneEl.classList.add('drag-over');
-        });
-        folderDropZoneEl.addEventListener('dragleave', () => {
-            folderDropZoneEl.classList.remove('drag-over');
-        });
-        folderDropZoneEl.addEventListener('drop', (e) => {
-            e.preventDefault();
-            folderDropZoneEl.classList.remove('drag-over');
-            const files = Array.from(e.dataTransfer.files);
-            const imageFiles = files.filter(f => f.type.startsWith('image/'));
-            imageFiles.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const newBox = { id: nextId++, type: 'image', width: 260, height: 240, content: event.target.result };
-                    boxes.push(newBox);
-                    renderAdminCanvas();
-                    selectedBoxId = newBox.id;
-                };
-                reader.readAsDataURL(file);
-            });
-        });
-    }
-
-    function initDragSort() {
-        if (sortableInstance) sortableInstance.destroy();
-        sortableInstance = new Sortable(gridContainerEl, {
-            animation: 200,
-            handle: '.free-box',
-            ghostClass: 'sortable-drag',
-            onEnd: () => {
-                const newOrder = [];
-                document.querySelectorAll('.free-box').forEach(el => {
-                    const found = boxes.find(b => b.id === parseInt(el.dataset.id));
-                    if (found) newOrder.push(found);
-                });
-                if (newOrder.length === boxes.length) boxes = newOrder;
-            }
-        });
-    }
-
-    // Save/Load
+            };
+        }
+        
+        if (newBox) {
+            boxes.push(newBox);
+            renderEditor();
+        }
+    });
+    
+    // Save and publish
     function saveDraft() {
         localStorage.setItem('blogBuilder_draft', JSON.stringify({ boxes, nextId }));
         alert('✅ Draft saved!');
     }
-
+    
     function publishStory() {
         localStorage.setItem('blogBuilder_published', JSON.stringify({ boxes, nextId }));
         alert('⭐ Published! Visitors will now see this story.');
-        renderVisitorView();
+        renderVisitor();
     }
-
-    function loadPublished() {
-        const saved = localStorage.getItem('blogBuilder_published');
-        if (saved) {
-            const data = JSON.parse(saved);
-            boxes = data.boxes || [];
-            nextId = data.nextId || 10;
-        } else {
-            // Demo content
-            const defaultRanked = getDefaultRankedData();
-            defaultRanked.items = generateRankedItems(5, []);
-            defaultRanked.openingStatement = 'Check out the hottest deals this week!';
-            boxes = [
-                { id: nextId++, type: 'text', width: 350, height: 200, content: '<h1 style="color:#f0c040;">🔥 Featured Story</h1><p>Welcome to DealStreets blog!</p>' },
-                { id: nextId++, type: 'ranked', width: 450, height: 550, rankedData: defaultRanked }
-            ];
-        }
-        renderVisitorView();
-    }
-
-    function loadDraftForAdmin() {
+    
+    function loadDraft() {
         const saved = localStorage.getItem('blogBuilder_draft');
         if (saved) {
             const data = JSON.parse(saved);
             boxes = data.boxes || [];
             nextId = data.nextId || 10;
         } else {
-            const defaultRanked = getDefaultRankedData();
-            defaultRanked.items = generateRankedItems(5, []);
+            // Default demo
             boxes = [
-                { id: nextId++, type: 'text', width: 350, height: 200, content: '<h1 style="color:#f0c040;">🔥 Featured Story</h1><p>Drag blocks to build your story!</p>' },
-                { id: nextId++, type: 'ranked', width: 450, height: 550, rankedData: defaultRanked }
+                { id: nextId++, type: 'text', width: 400, content: '<h1 style="color:#f0c040;">🔥 Welcome to Featured Story</h1><p>Drag blocks from the left to build your story. Click Publish when ready!</p>' },
+                { id: nextId++, type: 'ranked', width: 450, rankedData: {
+                    rankCount: 5,
+                    bannerImage: '',
+                    openingStatement: 'Check out these amazing deals!',
+                    items: [
+                        { rank: 5, title: 'Budget Pick', deal: '$20 off', image: '', description: 'Great value for money.' },
+                        { rank: 4, title: 'Staff Favorite', deal: '30% off', image: '', description: 'Highly recommended.' },
+                        { rank: 3, title: 'Top Seller', deal: 'Buy 1 Get 1', image: '', description: 'Most popular item.' },
+                        { rank: 2, title: 'Editors Choice', deal: '$50 off', image: '', description: 'Excellent quality.' },
+                        { rank: 1, title: 'Best Overall', deal: '40% off + Free Ship', image: '', description: 'The best deal this month.' }
+                    ],
+                    conclusion: 'Don\'t miss out on these offers!'
+                }}
             ];
         }
-        renderAdminCanvas();
+        renderEditor();
     }
-
-    // Admin Login
-    function checkAdminLogin() {
-        const pwd = document.getElementById('adminPasswordInput').value;
+    
+    // Login functions
+    function showLogin() {
+        document.getElementById('loginOverlay').classList.remove('hide');
+    }
+    
+    function checkLogin() {
+        const pwd = document.getElementById('adminPassword').value;
         if (pwd === MASTER_CODE) {
-            adminLoggedIn = true;
             document.getElementById('loginOverlay').classList.add('hide');
-            document.getElementById('adminView').style.display = 'flex';
-            document.getElementById('visitorView').classList.remove('show');
-            loadDraftForAdmin();
+            document.getElementById('visitorView').style.display = 'none';
+            document.getElementById('editorView').style.display = 'block';
+            loadDraft();
         } else {
-            alert('Invalid code');
+            alert('Invalid password');
         }
     }
-
-    function showAdminLoginFromVisitor() {
-        document.getElementById('loginOverlay').classList.remove('hide');
-    }
-
-    function adminLogout() {
-        adminLoggedIn = false;
-        document.getElementById('adminView').style.display = 'none';
-        document.getElementById('visitorView').classList.add('show');
-        document.getElementById('loginOverlay').classList.remove('hide');
-        loadPublished();
-    }
-
-    // UI Buttons
-    document.getElementById('toggleRulerBtn')?.addEventListener('click', () => {
-        rulerVisible = !rulerVisible;
-        document.getElementById('freeGrid').classList.toggle('show-ruler', rulerVisible);
-        document.getElementById('toggleRulerBtn').innerHTML = rulerVisible ? '📏 Hide Grid' : '📏 Show Grid';
-    });
     
-    document.getElementById('previewModeBtn')?.addEventListener('click', () => {
-        previewMode = !previewMode;
-        document.getElementById('previewModeBtn').innerText = previewMode ? '👁️ Preview ON' : '👁️ Preview OFF';
-        if (previewMode) document.querySelector('.canvas-area').classList.add('preview-mode');
-        else document.querySelector('.canvas-area').classList.remove('preview-mode');
-    });
+    function logout() {
+        document.getElementById('visitorView').style.display = 'block';
+        document.getElementById('editorView').style.display = 'none';
+        renderVisitor();
+    }
     
-    document.getElementById('saveDraftBtn')?.addEventListener('click', saveDraft);
-    document.getElementById('publishBtn')?.addEventListener('click', publishStory);
-    document.getElementById('resetCanvasBtn')?.addEventListener('click', () => {
-        if (confirm('Reset all blocks?')) {
-            boxes = [];
-            nextId = 1;
-            selectedBoxId = null;
-            renderAdminCanvas();
-        }
-    });
-
-    // Modal events
-    document.getElementById('closeRankedModal')?.addEventListener('click', () => {
+    function closeRankedModal() {
         document.getElementById('rankedModal').classList.remove('active');
-        currentEditingBoxId = null;
-    });
-    document.getElementById('cancelRankedEdit')?.addEventListener('click', () => {
-        document.getElementById('rankedModal').classList.remove('active');
-        currentEditingBoxId = null;
-    });
-    document.getElementById('saveRankedList')?.addEventListener('click', saveRankedList);
-    document.getElementById('closeTextModal')?.addEventListener('click', () => {
+        currentEditId = null;
+    }
+    
+    function closeTextModal() {
         document.getElementById('textModal').classList.remove('active');
-        currentEditingBoxId = null;
-    });
-    document.getElementById('cancelTextEdit')?.addEventListener('click', () => {
-        document.getElementById('textModal').classList.remove('active');
-        currentEditingBoxId = null;
-    });
-    document.getElementById('saveTextEdit')?.addEventListener('click', saveTextEdit);
-
+        currentEditId = null;
+    }
+    
+    // Make functions global
+    window.editBlock = editBlock;
+    window.deleteBlock = deleteBlock;
+    window.saveDraft = saveDraft;
+    window.publishStory = publishStory;
+    window.showLogin = showLogin;
+    window.checkLogin = checkLogin;
+    window.logout = logout;
+    window.saveRankedEdit = saveRankedEdit;
+    window.closeRankedModal = closeRankedModal;
+    window.saveTextEdit = saveTextEdit;
+    window.closeTextModal = closeTextModal;
+    window.changeRankCount = changeRankCount;
+    
     // Initialize
-    loadPublished();
-    document.getElementById('visitorView').classList.add('show');
+    renderVisitor();
 </script>
 </body>
 </html>
