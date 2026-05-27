@@ -142,7 +142,7 @@
             margin-top: 0.3rem;
         }
 
-        /* Featured Story View (what visitors see) */
+        /* Featured Story View */
         .featured-view {
             display: block;
             max-width: 1000px;
@@ -204,66 +204,82 @@
 
         .featured-content h3 {
             color: #f0c040;
-            margin: 1.2rem 0 0.5rem;
+            margin: 1rem 0 0.5rem;
             font-size: 1.3rem;
         }
 
-        .featured-content ul, .featured-content ol {
-            margin: 0.5rem 0 1rem 1.5rem;
+        /* Ranked List Styles */
+        .ranked-banner {
+            width: 100%;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
         }
 
-        .featured-content li {
+        .opening-statement {
+            background: rgba(240,192,64,0.1);
+            border-left: 4px solid #f0c040;
+            padding: 1.2rem;
+            margin: 1rem 0 2rem 0;
+            font-size: 1.1rem;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .rank-item {
+            margin-bottom: 2.5rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .rank-number {
+            background: linear-gradient(135deg, #f0c040, #e63946);
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            color: #000;
+            border-radius: 0 0 12px 0;
+        }
+
+        .rank-content {
+            padding: 1.2rem;
+        }
+
+        .rank-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #f0c040;
             margin-bottom: 0.5rem;
         }
 
-        .featured-content blockquote {
-            border-left: 4px solid #f0c040;
-            background: rgba(10,10,20,0.6);
-            padding: 0.75rem 1.25rem;
-            margin: 1rem 0;
-            font-style: italic;
+        .rank-deal {
+            background: #e63946;
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 0.8rem;
         }
 
-        .list-item {
-            background: rgba(0,0,0,0.3);
-            border-radius: 10px;
-            padding: 1rem;
+        .rank-image {
+            max-width: 100%;
+            border-radius: 12px;
             margin: 0.8rem 0;
-            display: flex;
-            gap: 1rem;
-            align-items: flex-start;
         }
 
-        .list-number {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 2rem;
-            color: #f0c040;
-            min-width: 50px;
+        .rank-description {
+            line-height: 1.6;
         }
 
-        .featured-box {
-            background: linear-gradient(135deg, rgba(240,192,64,0.1), rgba(0,0,0,0.3));
+        .conclusion-box {
+            background: linear-gradient(135deg, rgba(240,192,64,0.15), rgba(0,0,0,0.3));
             border: 2px solid #f0c040;
             border-radius: 16px;
             padding: 1.5rem;
-            margin: 1rem 0;
+            margin-top: 2rem;
         }
 
-        .interview-q {
-            color: #f0c040;
-            font-weight: bold;
-            margin-top: 1.2rem;
-            font-size: 1.1rem;
-        }
-
-        .interview-a {
-            margin-left: 1rem;
-            padding-left: 1rem;
-            border-left: 2px solid #f0c040;
-            margin-bottom: 1rem;
-        }
-
-        /* Archive View (past stories) */
+        /* Archive View */
         .archive-view {
             display: none;
             max-width: 1100px;
@@ -323,12 +339,6 @@
             font-family: 'Bebas Neue', sans-serif;
             font-size: 1.4rem;
             color: #f0c040;
-        }
-
-        .archive-card-meta {
-            font-size: 0.75rem;
-            color: #888;
-            margin-top: 0.3rem;
         }
 
         /* Admin Panel */
@@ -465,6 +475,32 @@
             cursor: pointer;
         }
 
+        /* Ranked List Editor Styles */
+        .rank-editor-item {
+            background: #0a0a14;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #2a2d38;
+        }
+
+        .rank-editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #2a2d38;
+        }
+
+        .rank-number-badge {
+            background: #f0c040;
+            color: #000;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
         .login-modal {
             position: fixed;
             top: 0;
@@ -531,6 +567,7 @@
         @media (max-width: 600px) {
             .hero h1 { font-size: 1.8rem; }
             .featured-title { font-size: 2rem; }
+            .rank-title { font-size: 1.1rem; }
         }
     </style>
 </head>
@@ -552,7 +589,6 @@
         <p>The latest feature — new stories published regularly</p>
     </div>
 
-    <!-- Featured Story View (What visitors see) -->
     <div id="featuredView" class="featured-view">
         <div id="featuredContent"></div>
         <div style="text-align: center; margin-top: 2rem;">
@@ -560,7 +596,6 @@
         </div>
     </div>
 
-    <!-- Archive View (Past stories) -->
     <div id="archiveView" class="archive-view">
         <div class="archive-header">
             <button class="archive-back" onclick="showFeatured()">← Back to Current Story</button>
@@ -615,7 +650,7 @@
 
 <!-- Article Editor Modal -->
 <div id="articleEditorModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.98); z-index:1100; overflow-y:auto; padding:2rem;">
-    <div style="max-width:900px; margin:0 auto; background:#16181f; border-radius:16px; padding:1.5rem;">
+    <div style="max-width:1000px; margin:0 auto; background:#16181f; border-radius:16px; padding:1.5rem;">
         <h2 id="editorTitle">Write New Story</h2>
         <input type="text" id="editArticleId" style="display:none;">
         <input type="text" id="editTitle" placeholder="Story Title" style="width:100%; margin-bottom:0.5rem; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
@@ -625,10 +660,10 @@
             <input type="text" id="editCategory" placeholder="Category" style="flex:1; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
         </div>
         <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
-            <select id="editTemplateType" style="flex:1; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
+            <select id="editTemplateType" style="flex:1; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;" onchange="switchTemplateType()">
                 <option value="blank">📄 Blank Canvas (Full HTML control)</option>
                 <option value="standard">📝 Standard Article</option>
-                <option value="list">📊 Top List</option>
+                <option value="ranked">🏆 Ranked List (Top 5/10 etc.)</option>
                 <option value="featured">⭐ Featured Product</option>
                 <option value="interview">🎤 Interview</option>
             </select>
@@ -638,8 +673,8 @@
         <div id="templateFields"></div>
         
         <div style="display:flex; gap:0.5rem; margin-top:1rem;">
-            <button class="btn" onclick="saveArticle()">Save as Draft</button>
-            <button class="btn" style="background:#00a86b;" onclick="saveAndPublish()">Save & Publish Now</button>
+            <button class="btn" onclick="saveArticle(false)">Save as Draft</button>
+            <button class="btn" style="background:#00a86b;" onclick="saveArticle(true)">Save & Publish Now</button>
             <button class="btn btn-secondary" onclick="closeArticleEditor()">Cancel</button>
         </div>
     </div>
@@ -648,13 +683,12 @@
 <div id="toast" class="toast">✅ <span id="toastMsg"></span></div>
 
 <script>
-    const MASTER_CODE = 'DealStreetsMaster2025!';
+    const MASTER_CODE = 'Metapizix';
     let adminLoggedIn = false;
     let uploadedImages = [];
     let articles = [];
-    let publishedStoryId = null;  // The ID of the currently featured story
+    let publishedStoryId = null;
     
-    // Load data from localStorage
     function loadData() {
         const savedArticles = localStorage.getItem('blog_articles');
         if (savedArticles) articles = JSON.parse(savedArticles);
@@ -684,7 +718,61 @@
         setTimeout(() => document.getElementById('toast').classList.remove('show'), 3000);
     }
     
-    // Render what visitors see
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+    }
+    
+    // ============ RANKED LIST RENDERER ============
+    function renderRankedList(article) {
+        let itemsHtml = '';
+        if (article.rankedItems && article.rankedItems.length) {
+            itemsHtml = article.rankedItems.map((item, idx) => {
+                const rankNumber = article.rankCount - idx;
+                return `
+                    <div class="rank-item">
+                        <div class="rank-number">#${rankNumber}</div>
+                        <div class="rank-content">
+                            <div class="rank-title">${escapeHtml(item.title)}</div>
+                            ${item.deal ? `<div class="rank-deal">🔥 ${escapeHtml(item.deal)}</div>` : ''}
+                            ${item.image ? `<img class="rank-image" src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}">` : ''}
+                            <div class="rank-description">${item.description || ''}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        return `
+            ${article.bannerImage ? `<img class="ranked-banner" src="${escapeHtml(article.bannerImage)}" alt="Banner">` : ''}
+            ${article.openingStatement ? `<div class="opening-statement">${article.openingStatement}</div>` : ''}
+            <h2>The List</h2>
+            ${itemsHtml}
+            ${article.conclusion ? `<div class="conclusion-box">${article.conclusion}</div>` : ''}
+        `;
+    }
+    
+    function renderTemplateContent(article) {
+        switch(article.templateType) {
+            case 'ranked':
+                return renderRankedList(article);
+            case 'blank':
+                return article.customHtml || '<p><em>No content yet.</em></p>';
+            case 'featured':
+                let pros = (article.pros || []).map(p => `<li>✅ ${escapeHtml(p)}</li>`).join('');
+                let cons = (article.cons || []).map(c => `<li>❌ ${escapeHtml(c)}</li>`).join('');
+                return `<div class="featured-box"><strong>💰 Price:</strong> ${escapeHtml(article.productPrice || '')}</div>
+                        <h2>👍 Pros</h2><ul>${pros}</ul><h2>👎 Cons</h2><ul>${cons}</ul>
+                        <div class="featured-box"><strong>🏆 Verdict:</strong> ${escapeHtml(article.finalVerdict || '')}</div>`;
+            case 'interview':
+                let qa = (article.questions || []).map(q => `<div class="interview-q">🎤 Q: ${escapeHtml(q.q)}</div><div class="interview-a">💬 A: ${escapeHtml(q.a)}</div>`).join('');
+                return `<div class="featured-box"><strong>👤 Guest:</strong> ${escapeHtml(article.guestName || '')}</div>${qa}${article.closingNote ? `<div class="featured-box">📌 ${escapeHtml(article.closingNote)}</div>` : ''}`;
+            default:
+                let sections = (article.sections || []).map(s => `<h2>${escapeHtml(s.heading)}</h2>${s.content}`).join('');
+                return sections;
+        }
+    }
+    
     function renderForVisitors() {
         const publishedArticle = articles.find(a => a.id === publishedStoryId);
         const featuredContainer = document.getElementById('featuredContent');
@@ -712,29 +800,6 @@
         }
     }
     
-    function renderTemplateContent(article) {
-        switch(article.templateType) {
-            case 'blank':
-                return article.customHtml || '<p><em>No content yet.</em></p>';
-            case 'list':
-                let items = (article.listItems || []).map((item, idx) => `<div class="list-item"><div class="list-number">${idx+1}</div><div><strong>${escapeHtml(item.name)}</strong><br><span style="color:#f0c040;">🔥 ${escapeHtml(item.deal)}</span><br><span style="font-size:0.85rem;">${escapeHtml(item.note || '')}</span></div></div>`).join('');
-                return `${items}${article.conclusion ? `<div class="featured-box">💡 ${escapeHtml(article.conclusion)}</div>` : ''}`;
-            case 'featured':
-                let pros = (article.pros || []).map(p => `<li>✅ ${escapeHtml(p)}</li>`).join('');
-                let cons = (article.cons || []).map(c => `<li>❌ ${escapeHtml(c)}</li>`).join('');
-                return `<div class="featured-box"><strong>💰 Price:</strong> ${escapeHtml(article.productPrice || '')}</div>
-                        <h2>👍 Pros</h2><ul>${pros}</ul><h2>👎 Cons</h2><ul>${cons}</ul>
-                        <div class="featured-box"><strong>🏆 Verdict:</strong> ${escapeHtml(article.finalVerdict || '')}</div>`;
-            case 'interview':
-                let qa = (article.questions || []).map(q => `<div class="interview-q">🎤 Q: ${escapeHtml(q.q)}</div><div class="interview-a">💬 A: ${escapeHtml(q.a)}</div>`).join('');
-                return `<div class="featured-box"><strong>👤 Guest:</strong> ${escapeHtml(article.guestName || '')}</div>${qa}${article.closingNote ? `<div class="featured-box">📌 ${escapeHtml(article.closingNote)}</div>` : ''}`;
-            default:
-                let sections = (article.sections || []).map(s => `<h2>${escapeHtml(s.heading)}</h2>${s.content}`).join('');
-                return sections;
-        }
-    }
-    
-    // Archive view
     function showArchive() {
         const archiveList = articles.filter(a => a.id !== publishedStoryId).reverse();
         const container = document.getElementById('archiveList');
@@ -764,7 +829,6 @@
         const article = articles.find(a => a.id === articleId);
         if (!article) return;
         
-        // Show archived story in a modal-style view
         const modal = document.createElement('div');
         modal.style.cssText = 'position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.98); z-index:2000; overflow-y:auto; padding:2rem;';
         modal.innerHTML = `
@@ -782,7 +846,7 @@
         modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
     }
     
-    // Admin functions
+    // ============ ADMIN FUNCTIONS ============
     function openAdminPanel() {
         if (adminLoggedIn) {
             document.getElementById('adminPanel').classList.add('open');
@@ -804,7 +868,7 @@
             document.getElementById('loginModal').classList.add('hide');
             openAdminPanel();
             showToast('Logged in');
-            renderForVisitors(); // Show admin buttons if needed
+            renderForVisitors();
         } else {
             showToast('Invalid code');
         }
@@ -855,37 +919,136 @@
         document.getElementById('editCategory').value = article?.category || '';
         document.getElementById('editExcerpt').value = article?.excerpt || '';
         document.getElementById('editTemplateType').value = article?.templateType || 'blank';
-        updateTemplateFields(article);
+        switchTemplateType(article);
         document.getElementById('articleEditorModal').style.display = 'block';
     }
     
-    function updateTemplateFields(article) {
-        const container = document.getElementById('templateFields');
+    function switchTemplateType(existingArticle = null) {
         const type = document.getElementById('editTemplateType').value;
-        if (type === 'blank') {
-            container.innerHTML = `<textarea id="editCustomHtml" placeholder="Custom HTML content (full freedom)" rows="10" style="width:100%; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${escapeHtml(article?.customHtml || '')}</textarea>`;
-        } else if (type === 'list') {
-            container.innerHTML = `<textarea id="editListItems" placeholder='JSON array: [{"name":"Item","deal":"50% off","note":"optional"}]' rows="6" style="width:100%; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${JSON.stringify(article?.listItems || [{name:"Example",deal:"50% off"}], null, 2)}</textarea>
-                                    <input type="text" id="editConclusion" placeholder="Conclusion" value="${escapeHtml(article?.conclusion || '')}" style="width:100%; margin-top:0.5rem; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">`;
+        const container = document.getElementById('templateFields');
+        const article = existingArticle || null;
+        
+        if (type === 'ranked') {
+            const rankCount = article?.rankCount || 10;
+            const rankedItems = article?.rankedItems || [];
+            
+            let itemsHtml = '';
+            for (let i = rankCount; i >= 1; i--) {
+                const existingItem = rankedItems.find(item => item.rank === i);
+                itemsHtml += `
+                    <div class="rank-editor-item">
+                        <div class="rank-editor-header">
+                            <span class="rank-number-badge">#${i}</span>
+                        </div>
+                        <input type="text" id="rank_title_${i}" placeholder="Item Title" value="${escapeHtml(existingItem?.title || '')}" style="width:100%; margin-bottom:0.5rem; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">
+                        <input type="text" id="rank_deal_${i}" placeholder="Deal / Price / Discount" value="${escapeHtml(existingItem?.deal || '')}" style="width:100%; margin-bottom:0.5rem; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">
+                        <input type="text" id="rank_image_${i}" placeholder="Image URL (paste from Image Uploader)" value="${escapeHtml(existingItem?.image || '')}" style="width:100%; margin-bottom:0.5rem; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">
+                        <textarea id="rank_desc_${i}" placeholder="Description / Review for #${i}" rows="3" style="width:100%; margin-bottom:0.5rem; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">${escapeHtml(existingItem?.description || '')}</textarea>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = `
+                <div style="margin-bottom:1rem;">
+                    <label style="color:#888;">Banner Image URL:</label>
+                    <input type="text" id="rankBannerImage" placeholder="Paste image URL for article banner" value="${escapeHtml(article?.bannerImage || '')}" style="width:100%; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label style="color:#888;">Number of Items (Top ?):</label>
+                    <select id="rankCount" style="width:100%; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;" onchange="rebuildRankedFields()">
+                        <option value="3">Top 3</option>
+                        <option value="5" ${rankCount === 5 ? 'selected' : ''}>Top 5</option>
+                        <option value="6" ${rankCount === 6 ? 'selected' : ''}>Top 6</option>
+                        <option value="8" ${rankCount === 8 ? 'selected' : ''}>Top 8</option>
+                        <option value="10" ${rankCount === 10 ? 'selected' : ''}>Top 10</option>
+                        <option value="12" ${rankCount === 12 ? 'selected' : ''}>Top 12</option>
+                        <option value="15" ${rankCount === 15 ? 'selected' : ''}>Top 15</option>
+                        <option value="20" ${rankCount === 20 ? 'selected' : ''}>Top 20</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label style="color:#888;">Opening Statement (sets the tone):</label>
+                    <textarea id="rankOpening" rows="3" placeholder="Write an engaging opening that introduces the list..." style="width:100%; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">${escapeHtml(article?.openingStatement || '')}</textarea>
+                </div>
+                <div id="rankedItemsContainer">
+                    ${itemsHtml}
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label style="color:#888;">Conclusion / Final Thoughts:</label>
+                    <textarea id="rankConclusion" rows="4" placeholder="Wrap up the list with final thoughts, recommendations, or a call to action..." style="width:100%; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">${escapeHtml(article?.conclusion || '')}</textarea>
+                </div>
+            `;
+        } else if (type === 'blank') {
+            container.innerHTML = `<textarea id="editCustomHtml" placeholder="Custom HTML content (full freedom)" rows="15" style="width:100%; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${escapeHtml(article?.customHtml || '')}</textarea>`;
         } else if (type === 'featured') {
             container.innerHTML = `<input type="text" id="editProductPrice" placeholder="Price" value="${escapeHtml(article?.productPrice || '')}" style="width:100%; margin-bottom:0.5rem; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
-                                    <textarea id="editPros" placeholder='Pros (JSON array)' rows="3" style="width:100%; margin-bottom:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${JSON.stringify(article?.pros || [], null, 2)}</textarea>
-                                    <textarea id="editCons" placeholder='Cons (JSON array)' rows="3" style="width:100%; margin-bottom:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${JSON.stringify(article?.cons || [], null, 2)}</textarea>
+                                    <textarea id="editPros" placeholder='Pros (one per line)' rows="3" style="width:100%; margin-bottom:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${(article?.pros || []).join('\n')}</textarea>
+                                    <textarea id="editCons" placeholder='Cons (one per line)' rows="3" style="width:100%; margin-bottom:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${(article?.cons || []).join('\n')}</textarea>
                                     <input type="text" id="editFinalVerdict" placeholder="Final Verdict" value="${escapeHtml(article?.finalVerdict || '')}" style="width:100%; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">`;
         } else if (type === 'interview') {
             container.innerHTML = `<input type="text" id="editGuestName" placeholder="Guest Name" value="${escapeHtml(article?.guestName || '')}" style="width:100%; margin-bottom:0.5rem; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
-                                    <textarea id="editQuestions" placeholder='Questions/Answers JSON: [{"q":"Question?","a":"Answer"}]' rows="6" style="width:100%; margin-bottom:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${JSON.stringify(article?.questions || [], null, 2)}</textarea>
+                                    <div id="interviewQaContainer"></div>
+                                    <button type="button" class="btn-secondary" onclick="addInterviewQuestion()" style="margin-bottom:0.5rem;">+ Add Question</button>
                                     <input type="text" id="editClosingNote" placeholder="Closing Note" value="${escapeHtml(article?.closingNote || '')}" style="width:100%; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">`;
+            // Load existing questions if any
+            window.interviewQuestions = article?.questions || [];
+            renderInterviewQuestions();
         } else {
-            container.innerHTML = `<textarea id="editSections" placeholder='Sections JSON: [{"heading":"Title","content":"<p>HTML</p>"}]' rows="8" style="width:100%; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${JSON.stringify(article?.sections || [], null, 2)}</textarea>`;
+            container.innerHTML = `<div id="standardSectionsContainer"></div>
+                                    <button type="button" class="btn-secondary" onclick="addStandardSection()">+ Add Section</button>`;
+            window.standardSections = article?.sections || [];
+            renderStandardSections();
         }
     }
     
-    document.getElementById('editTemplateType').addEventListener('change', () => updateTemplateFields(null));
+    window.rebuildRankedFields = function() {
+        const rankCount = parseInt(document.getElementById('rankCount').value);
+        const container = document.getElementById('rankedItemsContainer');
+        let itemsHtml = '';
+        for (let i = rankCount; i >= 1; i--) {
+            itemsHtml += `
+                <div class="rank-editor-item">
+                    <div class="rank-editor-header">
+                        <span class="rank-number-badge">#${i}</span>
+                    </div>
+                    <input type="text" id="rank_title_${i}" placeholder="Item Title" style="width:100%; margin-bottom:0.5rem; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">
+                    <input type="text" id="rank_deal_${i}" placeholder="Deal / Price / Discount" style="width:100%; margin-bottom:0.5rem; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">
+                    <input type="text" id="rank_image_${i}" placeholder="Image URL (paste from Image Uploader)" style="width:100%; margin-bottom:0.5rem; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">
+                    <textarea id="rank_desc_${i}" placeholder="Description / Review for #${i}" rows="3" style="width:100%; margin-bottom:0.5rem; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;"></textarea>
+                </div>
+            `;
+        }
+        container.innerHTML = itemsHtml;
+    };
+    
+    function collectRankedData() {
+        const rankCount = parseInt(document.getElementById('rankCount').value);
+        const rankedItems = [];
+        for (let i = rankCount; i >= 1; i--) {
+            const title = document.getElementById(`rank_title_${i}`)?.value || '';
+            if (title.trim()) {
+                rankedItems.push({
+                    rank: i,
+                    title: title,
+                    deal: document.getElementById(`rank_deal_${i}`)?.value || '',
+                    image: document.getElementById(`rank_image_${i}`)?.value || '',
+                    description: document.getElementById(`rank_desc_${i}`)?.value || ''
+                });
+            }
+        }
+        return {
+            rankCount: rankCount,
+            rankedItems: rankedItems,
+            bannerImage: document.getElementById('rankBannerImage')?.value || '',
+            openingStatement: document.getElementById('rankOpening')?.value || '',
+            conclusion: document.getElementById('rankConclusion')?.value || ''
+        };
+    }
     
     function saveArticle(publish = false) {
         const id = document.getElementById('editArticleId').value;
         const templateType = document.getElementById('editTemplateType').value;
+        
         let article = {
             id: id || Date.now().toString(),
             title: document.getElementById('editTitle').value,
@@ -896,22 +1059,26 @@
             excerpt: document.getElementById('editExcerpt').value
         };
         
-        if (templateType === 'blank') {
+        if (templateType === 'ranked') {
+            const rankedData = collectRankedData();
+            article.rankCount = rankedData.rankCount;
+            article.rankedItems = rankedData.rankedItems;
+            article.bannerImage = rankedData.bannerImage;
+            article.openingStatement = rankedData.openingStatement;
+            article.conclusion = rankedData.conclusion;
+        } else if (templateType === 'blank') {
             article.customHtml = document.getElementById('editCustomHtml')?.value || '';
-        } else if (templateType === 'list') {
-            try { article.listItems = JSON.parse(document.getElementById('editListItems')?.value || '[]'); } catch(e) { article.listItems = []; }
-            article.conclusion = document.getElementById('editConclusion')?.value || '';
         } else if (templateType === 'featured') {
             article.productPrice = document.getElementById('editProductPrice')?.value || '';
-            try { article.pros = JSON.parse(document.getElementById('editPros')?.value || '[]'); } catch(e) { article.pros = []; }
-            try { article.cons = JSON.parse(document.getElementById('editCons')?.value || '[]'); } catch(e) { article.cons = []; }
+            article.pros = (document.getElementById('editPros')?.value || '').split('\n').filter(p => p.trim());
+            article.cons = (document.getElementById('editCons')?.value || '').split('\n').filter(c => c.trim());
             article.finalVerdict = document.getElementById('editFinalVerdict')?.value || '';
         } else if (templateType === 'interview') {
             article.guestName = document.getElementById('editGuestName')?.value || '';
-            try { article.questions = JSON.parse(document.getElementById('editQuestions')?.value || '[]'); } catch(e) { article.questions = []; }
+            article.questions = window.interviewQuestions || [];
             article.closingNote = document.getElementById('editClosingNote')?.value || '';
         } else {
-            try { article.sections = JSON.parse(document.getElementById('editSections')?.value || '[]'); } catch(e) { article.sections = []; }
+            article.sections = window.standardSections || [];
         }
         
         if (id) {
@@ -932,10 +1099,6 @@
         closeArticleEditor();
     }
     
-    function saveAndPublish() {
-        saveArticle(true);
-    }
-    
     function deleteArticle(id) {
         if (confirm('Delete this story?')) {
             articles = articles.filter(a => a.id !== id);
@@ -953,6 +1116,54 @@
     function closeArticleEditor() {
         document.getElementById('articleEditorModal').style.display = 'none';
     }
+    
+    // Interview helper functions
+    window.interviewQuestions = [];
+    function renderInterviewQuestions() {
+        const container = document.getElementById('interviewQaContainer');
+        if (!container) return;
+        container.innerHTML = window.interviewQuestions.map((qa, idx) => `
+            <div style="background:#0a0a14; padding:0.8rem; margin-bottom:0.5rem; border-radius:8px;">
+                <input type="text" placeholder="Question" value="${escapeHtml(qa.q)}" onchange="window.interviewQuestions[${idx}].q = this.value" style="width:100%; margin-bottom:0.3rem; padding:0.4rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">
+                <textarea placeholder="Answer" rows="2" onchange="window.interviewQuestions[${idx}].a = this.value" style="width:100%; padding:0.4rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">${escapeHtml(qa.a)}</textarea>
+                <button type="button" class="btn-danger" style="padding:0.2rem 0.5rem; font-size:0.7rem;" onclick="removeInterviewQuestion(${idx})">Remove</button>
+            </div>
+        `).join('');
+    }
+    
+    window.addInterviewQuestion = function() {
+        window.interviewQuestions.push({ q: '', a: '' });
+        renderInterviewQuestions();
+    };
+    
+    window.removeInterviewQuestion = function(idx) {
+        window.interviewQuestions.splice(idx, 1);
+        renderInterviewQuestions();
+    };
+    
+    // Standard sections helpers
+    window.standardSections = [];
+    function renderStandardSections() {
+        const container = document.getElementById('standardSectionsContainer');
+        if (!container) return;
+        container.innerHTML = window.standardSections.map((section, idx) => `
+            <div style="background:#0a0a14; padding:0.8rem; margin-bottom:0.5rem; border-radius:8px;">
+                <input type="text" placeholder="Section Heading" value="${escapeHtml(section.heading)}" onchange="window.standardSections[${idx}].heading = this.value" style="width:100%; margin-bottom:0.3rem; padding:0.4rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">
+                <textarea placeholder="Section Content (HTML allowed)" rows="4" onchange="window.standardSections[${idx}].content = this.value" style="width:100%; padding:0.4rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">${escapeHtml(section.content)}</textarea>
+                <button type="button" class="btn-danger" style="padding:0.2rem 0.5rem; font-size:0.7rem;" onclick="removeStandardSection(${idx})">Remove</button>
+            </div>
+        `).join('');
+    }
+    
+    window.addStandardSection = function() {
+        window.standardSections.push({ heading: '', content: '' });
+        renderStandardSections();
+    };
+    
+    window.removeStandardSection = function(idx) {
+        window.standardSections.splice(idx, 1);
+        renderStandardSections();
+    };
     
     // Image upload functions
     function renderImageGallery() {
@@ -996,11 +1207,6 @@
         });
     }
     
-    function escapeHtml(str) {
-        if (!str) return '';
-        return String(str).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-    }
-    
     // Setup drag & drop
     const dropZone = document.getElementById('dropZone');
     if (dropZone) {
@@ -1010,7 +1216,7 @@
         document.getElementById('imageUpload')?.addEventListener('change', e => handleImageUpload(e.target.files));
     }
     
-    // Night sky animation
+    // Night sky
     function createNightSky() {
         const sky = document.getElementById('nightSky');
         for (let i = 0; i < 200; i++) {
@@ -1041,7 +1247,6 @@
     window.doAdminLogin = doAdminLogin;
     window.showArticleEditor = showArticleEditor;
     window.saveArticle = saveArticle;
-    window.saveAndPublish = saveAndPublish;
     window.deleteArticle = deleteArticle;
     window.editArticle = editArticle;
     window.closeArticleEditor = closeArticleEditor;
@@ -1051,6 +1256,12 @@
     window.showArchive = showArchive;
     window.showFeatured = showFeatured;
     window.viewArchivedStory = viewArchivedStory;
+    window.switchTemplateType = switchTemplateType;
+    window.rebuildRankedFields = rebuildRankedFields;
+    window.addInterviewQuestion = addInterviewQuestion;
+    window.removeInterviewQuestion = removeInterviewQuestion;
+    window.addStandardSection = addStandardSection;
+    window.removeStandardSection = removeStandardSection;
     
     createNightSky();
     loadData();
