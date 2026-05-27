@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Featured Story — DealStreets</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: #0a0a14;
+            color: #e8e8f0;
+            min-height: 100vh;
+        }
+
+        .night-sky {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+            background: radial-gradient(ellipse at center, #0a0a2a 0%, #020210 100%);
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.1; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .shooting-star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: linear-gradient(135deg, white, rgba(255,255,255,0));
+            border-radius: 50%;
+            opacity: 0;
+            animation: shoot 4s linear infinite;
+        }
+
+        @keyframes shoot {
+            0% {
+                transform: translateX(0) translateY(0) rotate(135deg);
+                opacity: 1;
+                width: 2px;
+            }
+            70% {
+                opacity: 1;
+                width: 80px;
+            }
+            100% {
+                transform: translateX(-300px) translateY(300px) rotate(135deg);
+                opacity: 0;
+                width: 2px;
+            }
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+        }
+
+        .blog-header {
+            background: linear-gradient(90deg, rgba(10,10,20,0.95), rgba(19,21,30,0.95));
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid #2a2d38;
+            padding: 0 1.5rem;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            letter-spacing: 3px;
+            color: #f0c040;
+        }
+
+        .logo span {
+            color: #e63946;
+        }
+
+        .nav-link {
+            font-family: 'Share Tech Mono', monospace;
+            background: transparent;
+            border: 1.5px solid #2a2d38;
+            border-radius: 8px;
+            padding: 0.45rem 1.2rem;
+            color: #e8e8f0;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+
+        .nav-link:hover {
+            border-color: #f0c040;
+            color: #f0c040;
+        }
+
+        .hero {
+            background: rgba(10,10,20,0.7);
+            backdrop-filter: blur(4px);
+            border-bottom: 2px solid #f0c040;
+            padding: 2rem 1.5rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.5rem;
+            letter-spacing: 4px;
+            color: #f0c040;
+        }
+
+        .hero p {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 0.3rem;
+        }
+
+        /* Featured Story View */
+        .featured-view {
+            display: block;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .featured-view.hide {
+            display: none;
+        }
+
+        .featured-badge {
+            display: inline-block;
+            background: #f0c040;
+            color: #000;
+            font-family: 'Bebas Neue', sans-serif;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .featured-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3rem;
+            color: #f0c040;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .featured-meta {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #2a2d38;
+        }
+
+        .featured-content {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #ddd;
+        }
+
+        .featured-content img {
+            max-width: 100%;
+            border-radius: 12px;
+            margin: 1rem 0;
+            border: 1px solid #2a2d38;
+        }
+
+        .featured-content h2 {
+            color: #f0c040;
+            margin: 1.5rem 0 0.5rem;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.8rem;
+        }
+
+        .featured-content h3 {
+            color: #f0c040;
+            margin: 1rem 0 0.5rem;
+            font-size: 1.3rem;
+        }
+
+        /* Ranked List Styles */
+        .ranked-banner {
+            width: 100%;
+            border-radius: 16px;
+            margin-bottom: 1.5rem;
+        }
+
+        .opening-statement {
+            background: rgba(240,192,64,0.1);
+            border-left: 4px solid #f0c040;
+            padding: 1.2rem;
+            margin: 1rem 0 2rem 0;
+            font-size: 1.1rem;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .rank-item {
+            margin-bottom: 2.5rem;
+            background: rgba(0,0,0,0.3);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .rank-number {
+            background: linear-gradient(135deg, #f0c040, #e63946);
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            color: #000;
+            border-radius: 0 0 12px 0;
+        }
+
+        .rank-content {
+            padding: 1.2rem;
+        }
+
+        .rank-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #f0c040;
+            margin-bottom: 0.5rem;
+        }
+
+        .rank-deal {
+            background: #e63946;
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .rank-image {
+            max-width: 100%;
+            border-radius: 12px;
+            margin: 0.8rem 0;
+        }
+
+        .rank-description {
+            line-height: 1.6;
+        }
+
+        .conclusion-box {
+            background: linear-gradient(135deg, rgba(240,192,64,0.15), rgba(0,0,0,0.3));
+            border: 2px solid #f0c040;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        /* Archive View */
+        .archive-view {
+            display: none;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .archive-view.show {
+            display: block;
+        }
+
+        .archive-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .archive-back {
+            background: transparent;
+            border: 1.5px solid #2a2d38;
+            border-radius: 8px;
+            padding: 0.45rem 1.2rem;
+            color: #e8e8f0;
+            cursor: pointer;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .archive-back:hover {
+            border-color: #f0c040;
+            color: #f0c040;
+        }
+
+        .archive-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .archive-card {
+            background: rgba(22,24,31,0.9);
+            backdrop-filter: blur(2px);
+            border: 1px solid #2a2d38;
+            border-radius: 12px;
+            padding: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .archive-card:hover {
+            transform: translateX(5px);
+            border-color: #f0c040;
+        }
+
+        .archive-card-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.4rem;
+            color: #f0c040;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.98);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        .admin-panel.open {
+            display: block;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #16181f;
+            border: 1px solid #2a2d38;
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #2a2d38;
+        }
+
+        .current-featured {
+            background: #0a0a14;
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #f0c040;
+        }
+
+        .article-list-item {
+            background: #0a0a14;
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .publish-btn {
+            background: #00a86b;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.3rem 0.8rem;
+            cursor: pointer;
+        }
+
+        .publish-btn.active {
+            background: #f0c040;
+            color: #000;
+        }
+
+        .btn {
+            background: #f0c040;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            padding: 0.5rem 1.2rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+        }
+
+        .btn-danger {
+            background: #e63946;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #2a2d38;
+            color: #e8e8f0;
+        }
+
+        .drop-zone {
+            border: 2px dashed #2a2d38;
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            background: #0a0a14;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .image-card {
+            background: #1a1c26;
+            border: 1px solid #2a2d38;
+            border-radius: 8px;
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .copy-btn {
+            margin-top: 0.5rem;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
+            background: #f0c040;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Ranked List Editor Styles */
+        .rank-editor-item {
+            background: #0a0a14;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid #2a2d38;
+        }
+
+        .rank-editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #2a2d38;
+        }
+
+        .rank-number-badge {
+            background: #f0c040;
+            color: #000;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 1100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-modal.hide {
+            display: none;
+        }
+
+        .login-box {
+            background: #16181f;
+            border: 1px solid #2a2d38;
+            border-radius: 16px;
+            padding: 2rem;
+            width: 300px;
+            text-align: center;
+        }
+
+        .login-box input {
+            width: 100%;
+            background: #1a1c26;
+            border: 1px solid #2a2d38;
+            color: #e8e8f0;
+            padding: 0.6rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: #1a1c26;
+            border: 1px solid #f0c040;
+            padding: 0.75rem 1.2rem;
+            border-radius: 10px;
+            transform: translateY(130%);
+            transition: transform 0.3s;
+            z-index: 1200;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+        }
+
+        footer {
+            background: rgba(0,0,0,0.8);
+            border-top: 1px solid #2a2d38;
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 1.8rem; }
+            .featured-title { font-size: 2rem; }
+            .rank-title { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="night-sky" id="nightSky"></div>
+
+<div class="content-wrapper">
+    <div class="blog-header">
+        <div class="logo">Deal<span>Streets</span> // Featured Story</div>
+        <div>
+            <button class="nav-link" onclick="openAdminPanel()">🔐 Admin</button>
+            <a href="https://dealstreets.xyz" class="nav-link">← Back to Promos</a>
+        </div>
+    </div>
+
+    <div class="hero">
+        <h1>📰 Featured Story</h1>
+        <p>The latest feature — new stories published regularly</p>
+    </div>
+
+    <div id="featuredView" class="featured-view">
+        <div id="featuredContent"></div>
+        <div style="text-align: center; margin-top: 2rem;">
+            <button class="nav-link" onclick="showArchive()">📚 Browse Past Stories →</button>
+        </div>
+    </div>
+
+    <div id="archiveView" class="archive-view">
+        <div class="archive-header">
+            <button class="archive-back" onclick="showFeatured()">← Back to Current Story</button>
+            <h2 style="font-family:'Bebas Neue'; color:#f0c040;">Past Stories Archive</h2>
+        </div>
+        <div id="archiveList" class="archive-grid"></div>
+    </div>
+
+    <footer>
+        © 2025 DealStreets.xyz — Featured Story Blog
+    </footer>
+</div>
+
+<!-- Login Modal -->
+<div id="loginModal" class="login-modal hide">
+    <div class="login-box">
+        <h3>🔐 Admin Login</h3>
+        <input type="password" id="adminPassword" placeholder="Enter master code">
+        <button class="btn" onclick="doAdminLogin()">Login</button>
+    </div>
+</div>
+
+<!-- Admin Panel -->
+<div id="adminPanel" class="admin-panel">
+    <div class="admin-container">
+        <div class="admin-header">
+            <h2>🔧 Admin Dashboard</h2>
+            <button class="btn btn-secondary" onclick="closeAdminPanel()">Close</button>
+        </div>
+        
+        <div class="current-featured">
+            <strong>⭐ Currently Featured:</strong> <span id="currentFeaturedName">None</span>
+        </div>
+        
+        <div style="margin-bottom: 1rem;">
+            <button class="btn" onclick="showArticleEditor()">+ Write New Story</button>
+        </div>
+        
+        <h3>All Stories</h3>
+        <div id="articlesAdminList"></div>
+        
+        <hr style="border-color:#2a2d38; margin: 1.5rem 0;">
+        
+        <h3>📸 Image Uploader</h3>
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('imageUpload').click()">
+            📸 Drag & drop images here or click to upload
+            <input type="file" id="imageUpload" accept="image/*" multiple style="display:none">
+        </div>
+        <div id="imageGallery" class="image-grid"></div>
+    </div>
+</div>
+
+<!-- Article Editor Modal -->
+<div id="articleEditorModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.98); z-index:1100; overflow-y:auto; padding:2rem;">
+    <div style="max-width:1000px; margin:0 auto; background:#16181f; border-radius:16px; padding:1.5rem;">
+        <h2 id="editorTitle">Write New Story</h2>
+        <input type="text" id="editArticleId" style="display:none;">
+        <input type="text" id="editTitle" placeholder="Story Title" style="width:100%; margin-bottom:0.5rem; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
+        <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+            <input type="text" id="editDate" placeholder="Date (e.g., May 27, 2025)" style="flex:1; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
+            <input type="text" id="editAuthor" placeholder="Author" style="flex:1; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
+            <input type="text" id="editCategory" placeholder="Category" style="flex:1; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
+        </div>
+        <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+            <select id="editTemplateType" style="flex:1; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;" onchange="switchTemplateType()">
+                <option value="blank">📄 Blank Canvas (Full HTML control)</option>
+                <option value="standard">📝 Standard Article</option>
+                <option value="ranked">🏆 Ranked List (Top 5/10 etc.)</option>
+                <option value="featured">⭐ Featured Product</option>
+                <option value="interview">🎤 Interview</option>
+            </select>
+        </div>
+        <textarea id="editExcerpt" placeholder="Short excerpt (shown in archive only)" rows="2" style="width:100%; margin-bottom:0.5rem; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;"></textarea>
+        
+        <div id="templateFields"></div>
+        
+        <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+            <button class="btn" onclick="saveArticle(false)">Save as Draft</button>
+            <button class="btn" style="background:#00a86b;" onclick="saveArticle(true)">Save & Publish Now</button>
+            <button class="btn btn-secondary" onclick="closeArticleEditor()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast">✅ <span id="toastMsg"></span></div>
+
+<script>
+    const MASTER_CODE = 'DealStreetsMaster2025!';
+    let adminLoggedIn = false;
+    let uploadedImages = [];
+    let articles = [];
+    let publishedStoryId = null;
+    
+    function loadData() {
+        const savedArticles = localStorage.getItem('blog_articles');
+        if (savedArticles) articles = JSON.parse(savedArticles);
+        else articles = [];
+        
+        const savedPublished = localStorage.getItem('blog_published_id');
+        publishedStoryId = savedPublished || null;
+        
+        const savedImages = localStorage.getItem('blog_images');
+        if (savedImages) uploadedImages = JSON.parse(savedImages);
+        else uploadedImages = [];
+        
+        renderForVisitors();
+        if (adminLoggedIn) renderAdminList();
+    }
+    
+    function saveData() {
+        localStorage.setItem('blog_articles', JSON.stringify(articles));
+        localStorage.setItem('blog_published_id', publishedStoryId || '');
+        renderForVisitors();
+        if (adminLoggedIn) renderAdminList();
+    }
+    
+    function showToast(msg) {
+        document.getElementById('toastMsg').innerText = msg;
+        document.getElementById('toast').classList.add('show');
+        setTimeout(() => document.getElementById('toast').classList.remove('show'), 3000);
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+    }
+    
+    // ============ RANKED LIST RENDERER ============
+    function renderRankedList(article) {
+        let itemsHtml = '';
+        if (article.rankedItems && article.rankedItems.length) {
+            itemsHtml = article.rankedItems.map((item, idx) => {
+                const rankNumber = article.rankCount - idx;
+                return `
+                    <div class="rank-item">
+                        <div class="rank-number">#${rankNumber}</div>
+                        <div class="rank-content">
+                            <div class="rank-title">${escapeHtml(item.title)}</div>
+                            ${item.deal ? `<div class="rank-deal">🔥 ${escapeHtml(item.deal)}</div>` : ''}
+                            ${item.image ? `<img class="rank-image" src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}">` : ''}
+                            <div class="rank-description">${item.description || ''}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        return `
+            ${article.bannerImage ? `<img class="ranked-banner" src="${escapeHtml(article.bannerImage)}" alt="Banner">` : ''}
+            ${article.openingStatement ? `<div class="opening-statement">${article.openingStatement}</div>` : ''}
+            <h2>The List</h2>
+            ${itemsHtml}
+            ${article.conclusion ? `<div class="conclusion-box">${article.conclusion}</div>` : ''}
+        `;
+    }
+    
+    function renderTemplateContent(article) {
+        switch(article.templateType) {
+            case 'ranked':
+                return renderRankedList(article);
+            case 'blank':
+                return article.customHtml || '<p><em>No content yet.</em></p>';
+            case 'featured':
+                let pros = (article.pros || []).map(p => `<li>✅ ${escapeHtml(p)}</li>`).join('');
+                let cons = (article.cons || []).map(c => `<li>❌ ${escapeHtml(c)}</li>`).join('');
+                return `<div class="featured-box"><strong>💰 Price:</strong> ${escapeHtml(article.productPrice || '')}</div>
+                        <h2>👍 Pros</h2><ul>${pros}</ul><h2>👎 Cons</h2><ul>${cons}</ul>
+                        <div class="featured-box"><strong>🏆 Verdict:</strong> ${escapeHtml(article.finalVerdict || '')}</div>`;
+            case 'interview':
+                let qa = (article.questions || []).map(q => `<div class="interview-q">🎤 Q: ${escapeHtml(q.q)}</div><div class="interview-a">💬 A: ${escapeHtml(q.a)}</div>`).join('');
+                return `<div class="featured-box"><strong>👤 Guest:</strong> ${escapeHtml(article.guestName || '')}</div>${qa}${article.closingNote ? `<div class="featured-box">📌 ${escapeHtml(article.closingNote)}</div>` : ''}`;
+            default:
+                let sections = (article.sections || []).map(s => `<h2>${escapeHtml(s.heading)}</h2>${s.content}`).join('');
+                return sections;
+        }
+    }
+    
+    function renderForVisitors() {
+        const publishedArticle = articles.find(a => a.id === publishedStoryId);
+        const featuredContainer = document.getElementById('featuredContent');
+        
+        if (publishedArticle) {
+            featuredContainer.innerHTML = `
+                <div class="featured-badge">⭐ CURRENT FEATURED STORY</div>
+                <h1 class="featured-title">${escapeHtml(publishedArticle.title)}</h1>
+                <div class="featured-meta">
+                    📅 ${publishedArticle.date} | ✍️ ${escapeHtml(publishedArticle.author)} | 🏷️ ${escapeHtml(publishedArticle.category)}
+                </div>
+                <div class="featured-content">
+                    ${renderTemplateContent(publishedArticle)}
+                </div>
+            `;
+        } else {
+            featuredContainer.innerHTML = `
+                <div style="text-align: center; padding: 3rem;">
+                    <div style="font-size: 4rem;">📭</div>
+                    <h2>No Featured Story Yet</h2>
+                    <p>Check back soon for the latest feature!</p>
+                    ${adminLoggedIn ? '<button class="btn" onclick="showArticleEditor()" style="margin-top:1rem;">+ Write First Story</button>' : ''}
+                </div>
+            `;
+        }
+    }
+    
+    function showArchive() {
+        const archiveList = articles.filter(a => a.id !== publishedStoryId).reverse();
+        const container = document.getElementById('archiveList');
+        
+        if (archiveList.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:2rem; color:#888;">No past stories yet. Check back later!</div>';
+        } else {
+            container.innerHTML = archiveList.map(article => `
+                <div class="archive-card" onclick="viewArchivedStory('${article.id}')">
+                    <div class="archive-card-title">${escapeHtml(article.title)}</div>
+                    <div class="archive-card-meta">📅 ${article.date} | ✍️ ${escapeHtml(article.author)}</div>
+                    <div style="font-size:0.85rem; color:#aaa; margin-top:0.5rem;">${escapeHtml(article.excerpt)}</div>
+                </div>
+            `).join('');
+        }
+        
+        document.getElementById('featuredView').classList.add('hide');
+        document.getElementById('archiveView').classList.add('show');
+    }
+    
+    function showFeatured() {
+        document.getElementById('featuredView').classList.remove('hide');
+        document.getElementById('archiveView').classList.remove('show');
+    }
+    
+    function viewArchivedStory(articleId) {
+        const article = articles.find(a => a.id === articleId);
+        if (!article) return;
+        
+        const modal = document.createElement('div');
+        modal.style.cssText = 'position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.98); z-index:2000; overflow-y:auto; padding:2rem;';
+        modal.innerHTML = `
+            <div style="max-width:900px; margin:0 auto; background:#16181f; border-radius:16px; padding:1.5rem;">
+                <div style="display:flex; justify-content:flex-end;">
+                    <button onclick="this.closest('div').remove()" style="background:#e63946; border:none; color:white; padding:0.3rem 0.8rem; border-radius:6px; cursor:pointer;">✕ Close</button>
+                </div>
+                <div class="featured-badge" style="margin-top:0.5rem;">📚 ARCHIVED STORY</div>
+                <h1 class="featured-title" style="font-size:2rem;">${escapeHtml(article.title)}</h1>
+                <div class="featured-meta">📅 ${article.date} | ✍️ ${escapeHtml(article.author)} | 🏷️ ${escapeHtml(article.category)}</div>
+                <div class="featured-content">${renderTemplateContent(article)}</div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+    }
+    
+    // ============ ADMIN FUNCTIONS ============
+    function openAdminPanel() {
+        if (adminLoggedIn) {
+            document.getElementById('adminPanel').classList.add('open');
+            renderAdminList();
+            renderImageGallery();
+        } else {
+            document.getElementById('loginModal').classList.remove('hide');
+        }
+    }
+    
+    function closeAdminPanel() {
+        document.getElementById('adminPanel').classList.remove('open');
+    }
+    
+    function doAdminLogin() {
+        const pwd = document.getElementById('adminPassword').value;
+        if (pwd === MASTER_CODE) {
+            adminLoggedIn = true;
+            document.getElementById('loginModal').classList.add('hide');
+            openAdminPanel();
+            showToast('Logged in');
+            renderForVisitors();
+        } else {
+            showToast('Invalid code');
+        }
+    }
+    
+    function renderAdminList() {
+        const container = document.getElementById('articlesAdminList');
+        const publishedArticle = articles.find(a => a.id === publishedStoryId);
+        document.getElementById('currentFeaturedName').innerText = publishedArticle ? publishedArticle.title : 'None';
+        
+        if (articles.length === 0) {
+            container.innerHTML = '<p style="color:#888;">No stories yet. Click "Write New Story" to create your first feature.</p>';
+            return;
+        }
+        
+        container.innerHTML = articles.map(article => `
+            <div class="article-list-item">
+                <div>
+                    <strong>${escapeHtml(article.title)}</strong>
+                    <span style="color:#888; font-size:0.75rem; margin-left:0.5rem;">${article.templateType}</span>
+                    <div style="font-size:0.7rem; color:#666;">${article.date}</div>
+                </div>
+                <div style="display:flex; gap:0.5rem;">
+                    <button class="publish-btn ${publishedStoryId === article.id ? 'active' : ''}" onclick="setPublished('${article.id}')">
+                        ${publishedStoryId === article.id ? '⭐ Featured' : 'Publish'}
+                    </button>
+                    <button class="btn-secondary" style="padding:0.3rem 0.8rem;" onclick="editArticle('${article.id}')">Edit</button>
+                    <button class="btn-danger" style="padding:0.3rem 0.8rem;" onclick="deleteArticle('${article.id}')">Delete</button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function setPublished(articleId) {
+        publishedStoryId = articleId;
+        saveData();
+        renderAdminList();
+        showToast('Story published! Visitors will now see this as the Featured Story.');
+    }
+    
+    function showArticleEditor(articleId = null) {
+        const article = articleId ? articles.find(a => a.id === articleId) : null;
+        document.getElementById('editorTitle').innerText = article ? 'Edit Story' : 'Write New Story';
+        document.getElementById('editArticleId').value = articleId || '';
+        document.getElementById('editTitle').value = article?.title || '';
+        document.getElementById('editDate').value = article?.date || new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('editAuthor').value = article?.author || 'DealStreets Team';
+        document.getElementById('editCategory').value = article?.category || '';
+        document.getElementById('editExcerpt').value = article?.excerpt || '';
+        document.getElementById('editTemplateType').value = article?.templateType || 'blank';
+        switchTemplateType(article);
+        document.getElementById('articleEditorModal').style.display = 'block';
+    }
+    
+    function switchTemplateType(existingArticle = null) {
+        const type = document.getElementById('editTemplateType').value;
+        const container = document.getElementById('templateFields');
+        const article = existingArticle || null;
+        
+        if (type === 'ranked') {
+            const rankCount = article?.rankCount || 10;
+            const rankedItems = article?.rankedItems || [];
+            
+            let itemsHtml = '';
+            for (let i = rankCount; i >= 1; i--) {
+                const existingItem = rankedItems.find(item => item.rank === i);
+                itemsHtml += `
+                    <div class="rank-editor-item">
+                        <div class="rank-editor-header">
+                            <span class="rank-number-badge">#${i}</span>
+                        </div>
+                        <input type="text" id="rank_title_${i}" placeholder="Item Title" value="${escapeHtml(existingItem?.title || '')}" style="width:100%; margin-bottom:0.5rem; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">
+                        <input type="text" id="rank_deal_${i}" placeholder="Deal / Price / Discount" value="${escapeHtml(existingItem?.deal || '')}" style="width:100%; margin-bottom:0.5rem; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">
+                        <input type="text" id="rank_image_${i}" placeholder="Image URL (paste from Image Uploader)" value="${escapeHtml(existingItem?.image || '')}" style="width:100%; margin-bottom:0.5rem; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">
+                        <textarea id="rank_desc_${i}" placeholder="Description / Review for #${i}" rows="3" style="width:100%; margin-bottom:0.5rem; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">${escapeHtml(existingItem?.description || '')}</textarea>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = `
+                <div style="margin-bottom:1rem;">
+                    <label style="color:#888;">Banner Image URL:</label>
+                    <input type="text" id="rankBannerImage" placeholder="Paste image URL for article banner" value="${escapeHtml(article?.bannerImage || '')}" style="width:100%; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label style="color:#888;">Number of Items (Top ?):</label>
+                    <select id="rankCount" style="width:100%; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;" onchange="rebuildRankedFields()">
+                        <option value="3">Top 3</option>
+                        <option value="5" ${rankCount === 5 ? 'selected' : ''}>Top 5</option>
+                        <option value="6" ${rankCount === 6 ? 'selected' : ''}>Top 6</option>
+                        <option value="8" ${rankCount === 8 ? 'selected' : ''}>Top 8</option>
+                        <option value="10" ${rankCount === 10 ? 'selected' : ''}>Top 10</option>
+                        <option value="12" ${rankCount === 12 ? 'selected' : ''}>Top 12</option>
+                        <option value="15" ${rankCount === 15 ? 'selected' : ''}>Top 15</option>
+                        <option value="20" ${rankCount === 20 ? 'selected' : ''}>Top 20</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label style="color:#888;">Opening Statement (sets the tone):</label>
+                    <textarea id="rankOpening" rows="3" placeholder="Write an engaging opening that introduces the list..." style="width:100%; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">${escapeHtml(article?.openingStatement || '')}</textarea>
+                </div>
+                <div id="rankedItemsContainer">
+                    ${itemsHtml}
+                </div>
+                <div style="margin-bottom:1rem;">
+                    <label style="color:#888;">Conclusion / Final Thoughts:</label>
+                    <textarea id="rankConclusion" rows="4" placeholder="Wrap up the list with final thoughts, recommendations, or a call to action..." style="width:100%; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">${escapeHtml(article?.conclusion || '')}</textarea>
+                </div>
+            `;
+        } else if (type === 'blank') {
+            container.innerHTML = `<textarea id="editCustomHtml" placeholder="Custom HTML content (full freedom)" rows="15" style="width:100%; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${escapeHtml(article?.customHtml || '')}</textarea>`;
+        } else if (type === 'featured') {
+            container.innerHTML = `<input type="text" id="editProductPrice" placeholder="Price" value="${escapeHtml(article?.productPrice || '')}" style="width:100%; margin-bottom:0.5rem; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
+                                    <textarea id="editPros" placeholder='Pros (one per line)' rows="3" style="width:100%; margin-bottom:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${(article?.pros || []).join('\n')}</textarea>
+                                    <textarea id="editCons" placeholder='Cons (one per line)' rows="3" style="width:100%; margin-bottom:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px; padding:0.6rem;">${(article?.cons || []).join('\n')}</textarea>
+                                    <input type="text" id="editFinalVerdict" placeholder="Final Verdict" value="${escapeHtml(article?.finalVerdict || '')}" style="width:100%; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">`;
+        } else if (type === 'interview') {
+            container.innerHTML = `<input type="text" id="editGuestName" placeholder="Guest Name" value="${escapeHtml(article?.guestName || '')}" style="width:100%; margin-bottom:0.5rem; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">
+                                    <div id="interviewQaContainer"></div>
+                                    <button type="button" class="btn-secondary" onclick="addInterviewQuestion()" style="margin-bottom:0.5rem;">+ Add Question</button>
+                                    <input type="text" id="editClosingNote" placeholder="Closing Note" value="${escapeHtml(article?.closingNote || '')}" style="width:100%; padding:0.6rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:8px;">`;
+            // Load existing questions if any
+            window.interviewQuestions = article?.questions || [];
+            renderInterviewQuestions();
+        } else {
+            container.innerHTML = `<div id="standardSectionsContainer"></div>
+                                    <button type="button" class="btn-secondary" onclick="addStandardSection()">+ Add Section</button>`;
+            window.standardSections = article?.sections || [];
+            renderStandardSections();
+        }
+    }
+    
+    window.rebuildRankedFields = function() {
+        const rankCount = parseInt(document.getElementById('rankCount').value);
+        const container = document.getElementById('rankedItemsContainer');
+        let itemsHtml = '';
+        for (let i = rankCount; i >= 1; i--) {
+            itemsHtml += `
+                <div class="rank-editor-item">
+                    <div class="rank-editor-header">
+                        <span class="rank-number-badge">#${i}</span>
+                    </div>
+                    <input type="text" id="rank_title_${i}" placeholder="Item Title" style="width:100%; margin-bottom:0.5rem; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">
+                    <input type="text" id="rank_deal_${i}" placeholder="Deal / Price / Discount" style="width:100%; margin-bottom:0.5rem; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">
+                    <input type="text" id="rank_image_${i}" placeholder="Image URL (paste from Image Uploader)" style="width:100%; margin-bottom:0.5rem; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">
+                    <textarea id="rank_desc_${i}" placeholder="Description / Review for #${i}" rows="3" style="width:100%; margin-bottom:0.5rem; padding:0.5rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;"></textarea>
+                </div>
+            `;
+        }
+        container.innerHTML = itemsHtml;
+    };
+    
+    function collectRankedData() {
+        const rankCount = parseInt(document.getElementById('rankCount').value);
+        const rankedItems = [];
+        for (let i = rankCount; i >= 1; i--) {
+            const title = document.getElementById(`rank_title_${i}`)?.value || '';
+            if (title.trim()) {
+                rankedItems.push({
+                    rank: i,
+                    title: title,
+                    deal: document.getElementById(`rank_deal_${i}`)?.value || '',
+                    image: document.getElementById(`rank_image_${i}`)?.value || '',
+                    description: document.getElementById(`rank_desc_${i}`)?.value || ''
+                });
+            }
+        }
+        return {
+            rankCount: rankCount,
+            rankedItems: rankedItems,
+            bannerImage: document.getElementById('rankBannerImage')?.value || '',
+            openingStatement: document.getElementById('rankOpening')?.value || '',
+            conclusion: document.getElementById('rankConclusion')?.value || ''
+        };
+    }
+    
+    function saveArticle(publish = false) {
+        const id = document.getElementById('editArticleId').value;
+        const templateType = document.getElementById('editTemplateType').value;
+        
+        let article = {
+            id: id || Date.now().toString(),
+            title: document.getElementById('editTitle').value,
+            date: document.getElementById('editDate').value,
+            author: document.getElementById('editAuthor').value,
+            category: document.getElementById('editCategory').value,
+            templateType: templateType,
+            excerpt: document.getElementById('editExcerpt').value
+        };
+        
+        if (templateType === 'ranked') {
+            const rankedData = collectRankedData();
+            article.rankCount = rankedData.rankCount;
+            article.rankedItems = rankedData.rankedItems;
+            article.bannerImage = rankedData.bannerImage;
+            article.openingStatement = rankedData.openingStatement;
+            article.conclusion = rankedData.conclusion;
+        } else if (templateType === 'blank') {
+            article.customHtml = document.getElementById('editCustomHtml')?.value || '';
+        } else if (templateType === 'featured') {
+            article.productPrice = document.getElementById('editProductPrice')?.value || '';
+            article.pros = (document.getElementById('editPros')?.value || '').split('\n').filter(p => p.trim());
+            article.cons = (document.getElementById('editCons')?.value || '').split('\n').filter(c => c.trim());
+            article.finalVerdict = document.getElementById('editFinalVerdict')?.value || '';
+        } else if (templateType === 'interview') {
+            article.guestName = document.getElementById('editGuestName')?.value || '';
+            article.questions = window.interviewQuestions || [];
+            article.closingNote = document.getElementById('editClosingNote')?.value || '';
+        } else {
+            article.sections = window.standardSections || [];
+        }
+        
+        if (id) {
+            const index = articles.findIndex(a => a.id === id);
+            if (index !== -1) articles[index] = article;
+        } else {
+            articles.unshift(article);
+        }
+        
+        if (publish) {
+            publishedStoryId = article.id;
+            showToast('Story published and featured!');
+        } else {
+            showToast('Draft saved');
+        }
+        
+        saveData();
+        closeArticleEditor();
+    }
+    
+    function deleteArticle(id) {
+        if (confirm('Delete this story?')) {
+            articles = articles.filter(a => a.id !== id);
+            if (publishedStoryId === id) publishedStoryId = null;
+            saveData();
+            renderAdminList();
+            showToast('Story deleted');
+        }
+    }
+    
+    function editArticle(id) {
+        showArticleEditor(id);
+    }
+    
+    function closeArticleEditor() {
+        document.getElementById('articleEditorModal').style.display = 'none';
+    }
+    
+    // Interview helper functions
+    window.interviewQuestions = [];
+    function renderInterviewQuestions() {
+        const container = document.getElementById('interviewQaContainer');
+        if (!container) return;
+        container.innerHTML = window.interviewQuestions.map((qa, idx) => `
+            <div style="background:#0a0a14; padding:0.8rem; margin-bottom:0.5rem; border-radius:8px;">
+                <input type="text" placeholder="Question" value="${escapeHtml(qa.q)}" onchange="window.interviewQuestions[${idx}].q = this.value" style="width:100%; margin-bottom:0.3rem; padding:0.4rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">
+                <textarea placeholder="Answer" rows="2" onchange="window.interviewQuestions[${idx}].a = this.value" style="width:100%; padding:0.4rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">${escapeHtml(qa.a)}</textarea>
+                <button type="button" class="btn-danger" style="padding:0.2rem 0.5rem; font-size:0.7rem;" onclick="removeInterviewQuestion(${idx})">Remove</button>
+            </div>
+        `).join('');
+    }
+    
+    window.addInterviewQuestion = function() {
+        window.interviewQuestions.push({ q: '', a: '' });
+        renderInterviewQuestions();
+    };
+    
+    window.removeInterviewQuestion = function(idx) {
+        window.interviewQuestions.splice(idx, 1);
+        renderInterviewQuestions();
+    };
+    
+    // Standard sections helpers
+    window.standardSections = [];
+    function renderStandardSections() {
+        const container = document.getElementById('standardSectionsContainer');
+        if (!container) return;
+        container.innerHTML = window.standardSections.map((section, idx) => `
+            <div style="background:#0a0a14; padding:0.8rem; margin-bottom:0.5rem; border-radius:8px;">
+                <input type="text" placeholder="Section Heading" value="${escapeHtml(section.heading)}" onchange="window.standardSections[${idx}].heading = this.value" style="width:100%; margin-bottom:0.3rem; padding:0.4rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">
+                <textarea placeholder="Section Content (HTML allowed)" rows="4" onchange="window.standardSections[${idx}].content = this.value" style="width:100%; padding:0.4rem; background:#1a1c26; border:1px solid #2a2d38; color:white; border-radius:6px;">${escapeHtml(section.content)}</textarea>
+                <button type="button" class="btn-danger" style="padding:0.2rem 0.5rem; font-size:0.7rem;" onclick="removeStandardSection(${idx})">Remove</button>
+            </div>
+        `).join('');
+    }
+    
+    window.addStandardSection = function() {
+        window.standardSections.push({ heading: '', content: '' });
+        renderStandardSections();
+    };
+    
+    window.removeStandardSection = function(idx) {
+        window.standardSections.splice(idx, 1);
+        renderStandardSections();
+    };
+    
+    // Image upload functions
+    function renderImageGallery() {
+        const gallery = document.getElementById('imageGallery');
+        if (!gallery) return;
+        gallery.innerHTML = uploadedImages.map((img, idx) => `
+            <div class="image-card">
+                <img src="${img.url}" alt="${img.name}">
+                <div style="font-size:0.7rem; word-break:break-all;">${img.name}</div>
+                <button class="copy-btn" onclick="copyToClipboard('${img.url}')">Copy URL</button>
+                <button class="copy-btn" style="background:#e63946;" onclick="deleteImage(${idx})">Delete</button>
+            </div>
+        `).join('');
+        if (!uploadedImages.length) gallery.innerHTML = '<p style="text-align:center; grid-column:1/-1;">No images uploaded. Drag & drop some here.</p>';
+    }
+    
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text);
+        showToast('Image URL copied!');
+    }
+    
+    function deleteImage(idx) {
+        uploadedImages.splice(idx, 1);
+        localStorage.setItem('blog_images', JSON.stringify(uploadedImages));
+        renderImageGallery();
+        showToast('Image deleted');
+    }
+    
+    function handleImageUpload(files) {
+        Array.from(files).forEach(file => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    uploadedImages.push({ url: e.target.result, name: file.name, size: file.size });
+                    localStorage.setItem('blog_images', JSON.stringify(uploadedImages));
+                    renderImageGallery();
+                    showToast(`${file.name} uploaded`);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Setup drag & drop
+    const dropZone = document.getElementById('dropZone');
+    if (dropZone) {
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleImageUpload(e.dataTransfer.files); });
+        document.getElementById('imageUpload')?.addEventListener('change', e => handleImageUpload(e.target.files));
+    }
+    
+    // Night sky
+    function createNightSky() {
+        const sky = document.getElementById('nightSky');
+        for (let i = 0; i < 200; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.width = Math.random() * 2 + 1 + 'px';
+            star.style.height = star.style.width;
+            star.style.animationDelay = Math.random() * 5 + 's';
+            star.style.animationDuration = 2 + Math.random() * 3 + 's';
+            sky.appendChild(star);
+        }
+        setInterval(() => {
+            const shooting = document.createElement('div');
+            shooting.classList.add('shooting-star');
+            shooting.style.left = Math.random() * 60 + 20 + '%';
+            shooting.style.top = Math.random() * 30 + '%';
+            shooting.style.animationDuration = 3 + Math.random() * 2 + 's';
+            sky.appendChild(shooting);
+            setTimeout(() => shooting.remove(), 5000);
+        }, 8000);
+    }
+    
+    // Expose globals
+    window.openAdminPanel = openAdminPanel;
+    window.closeAdminPanel = closeAdminPanel;
+    window.doAdminLogin = doAdminLogin;
+    window.showArticleEditor = showArticleEditor;
+    window.saveArticle = saveArticle;
+    window.deleteArticle = deleteArticle;
+    window.editArticle = editArticle;
+    window.closeArticleEditor = closeArticleEditor;
+    window.copyToClipboard = copyToClipboard;
+    window.deleteImage = deleteImage;
+    window.setPublished = setPublished;
+    window.showArchive = showArchive;
+    window.showFeatured = showFeatured;
+    window.viewArchivedStory = viewArchivedStory;
+    window.switchTemplateType = switchTemplateType;
+    window.rebuildRankedFields = rebuildRankedFields;
+    window.addInterviewQuestion = addInterviewQuestion;
+    window.removeInterviewQuestion = removeInterviewQuestion;
+    window.addStandardSection = addStandardSection;
+    window.removeStandardSection = removeStandardSection;
+    
+    createNightSky();
+    loadData();
+</script>
+</body>
+</html>
